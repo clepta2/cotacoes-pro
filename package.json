@@ -1,0 +1,40 @@
+{
+  "name": "cotacoes-pro",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "SDK e API Oficial de Cotações, Câmbio Global, Criptomoedas, Indicadores Econômicos do Banco Central e Commodities Agro na borda Cloudflare Anycast (<5ms) com renderizador de gráficos SVG e histórico.",
+  "main": "cotacoes-pro.js",
+  "module": "cotacoes-pro.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "test": "node test.js",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": [
+    "cotacoes",
+    "dolar",
+    "cambio",
+    "moedas",
+    "cripto",
+    "bitcoin",
+    "selic",
+    "ipca",
+    "bacen",
+    "awesomeapi",
+    "conversor-moedas",
+    "cloudflare-worker",
+    "edge-computing",
+    "brasil",
+    "sdk"
+  ],
+  "author": "clepta2 <clepta2@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clepta2/cotacoes-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clepta2/cotacoes-pro/issues"
+  },
+  "homepage": "https://github.com/clepta2/cotacoes-pro#readme"
+}
