@@ -94,24 +94,24 @@ function resolverPlanoEChave(request) {
     return { plano: 'free', keyId: `ip_${clientIp}`, config: PLANOS_CONFIG.free, isAnonymous: true };
   }
 
-  if (token.startsWith('cot_master_') || token === 'cot_master_key_bypass') {
+  if (token.startsWith('cot_master_') && token.length >= 16) {
     return { plano: 'master', keyId: token, config: PLANOS_CONFIG.master, isAnonymous: false };
   }
-  if (token.startsWith('cot_biz_')) {
+  if (token.startsWith('cot_biz_') && token.length >= 16) {
     return { plano: 'business', keyId: token, config: PLANOS_CONFIG.business, isAnonymous: false };
   }
-  if (token.startsWith('cot_pro_')) {
+  if (token.startsWith('cot_pro_') && token.length >= 16) {
     return { plano: 'pro', keyId: token, config: PLANOS_CONFIG.pro, isAnonymous: false };
   }
-  if (token.startsWith('cot_start_')) {
+  if (token.startsWith('cot_start_') && token.length >= 12) {
     return { plano: 'starter', keyId: token, config: PLANOS_CONFIG.starter, isAnonymous: false };
   }
   if (token.startsWith('cot_free_') || token.startsWith('cot_test_')) {
     return { plano: 'free', keyId: token, config: PLANOS_CONFIG.free, isAnonymous: false };
   }
 
-  // Chave desconhecida assume starter (86.400 req/dia)
-  return { plano: 'starter', keyId: token, config: PLANOS_CONFIG.starter, isAnonymous: false };
+  // Chave desconhecida assume plano free com rate limit restrito
+  return { plano: 'free', keyId: token, config: PLANOS_CONFIG.free, isAnonymous: false };
 }
 
 function aplicarRateLimit(keyId, config) {
