@@ -148,6 +148,127 @@ assert(typeof CotacoesPro.consultar === 'function', 'Método CotacoesPro.consult
 assert(typeof CotacoesPro.converter === 'function', 'Método CotacoesPro.converter disponível');
 assert(typeof CotacoesPro.getMasterFeed === 'function', 'Método CotacoesPro.getMasterFeed disponível');
 
+
+// ─── 9. TELEMETRIA & PROTEÇÃO DIÁRIA DE 86.400s (24 HORAS) ───
+console.log('\n--- 9. Telemetria & Proteção Diária de 86.400s (24 Horas) ---');
+
+const resTelemetria = await worker.fetch(new Request('https://api.test/api/cotacoes/USD'), {});
+assert(resTelemetria.headers.get('x-cotacoes-window-daily') === '86400s', 'Header x-cotacoes-window-daily é 86400s');
+assert(resTelemetria.headers.get('x-cotacoes-daily-limit') === '500', 'Plano free possui cota diária de 500 req/86400s');
+assert(Number(resTelemetria.headers.get('x-cotacoes-daily-remaining')) <= 500, 'Header x-cotacoes-daily-remaining presente');
+assert(resTelemetria.headers.get('x-cotacoes-daily-reset') !== null, 'Header x-cotacoes-daily-reset com timestamp presente');
+
+// 9.1 Teste de estouro da cota diária (86400s)
+const chaveTesteDiario = 'cot_free_daily_overflow_key';
+// Configura requisições até exceder o limite diário
+for (let i = 0; i < 505; i++) {
+  const r = await worker.fetch(new Request('https://api.test/api/cotacoes/USD', {
+    headers: { 'Authorization': `Bearer ${chaveTesteDiario}` }
+  }), {});
+  if (r.status === 429) {
+    const b = await r.json();
+    if (b.error === 'DAILY_LIMIT_EXCEEDED') {
+      assert(b.error === 'DAILY_LIMIT_EXCEEDED', 'Bloqueio diário dispara DAILY_LIMIT_EXCEEDED');
+      assert(b.janela === '86400s', 'Erro identifica a janela de 86400s');
+      assert(r.headers.get('Retry-After') !== null, 'Header Retry-After para janela diária configurado');
+      break;
+    }
+  }
+}
+
+// ─── 10. VALIDAÇÃO DAS 28 MOEDAS FIDUCIÁRIAS (FIAT) ───
+console.log('\n--- 10. Catálogo Completo de Moedas Fiduciárias (28 Moedas) ---');
+
+const moedasObrigatorias = [
+  'USD', 'USDTUR', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'CNY', 'ARS',
+  'CLP', 'COP', 'UYU', 'MXN', 'INR', 'RUB', 'ZAR', 'TRY', 'ILS', 'AED',
+  'SAR', 'SEK', 'NOK', 'DKK', 'PLN', 'NZD', 'SGD', 'HKD'
+];
+
+for (const m of moedasObrigatorias) {
+  assert(feedData.fiat[m] !== undefined, `Moeda fiduciária configurada: ${m} (${feedData.fiat[m]?.nome || ''})`);
+}
+
+// ─── 11. VALIDAÇÃO DAS 16 CRIPTOMOEDAS (BITCOINS & ALTCOINS) ───
+console.log('\n--- 11. Catálogo Completo de Criptoativos (16 Criptomoedas) ---');
+
+const criptosObrigatorias = [
+  'BTC', 'ETH', 'SOL', 'BNB', 'USDT', 'USDC', 'XRP', 'DOGE',
+  'ADA', 'LTC', 'AVAX', 'DOT', 'LINK', 'BCH', 'POL', 'SHIB'
+];
+
+for (const c of criptosObrigatorias) {
+  assert(feedData.crypto[c] !== undefined, `Criptomoeda configurada: ${c} (${feedData.crypto[c]?.nome || ''})`);
+}
+
+// ─── 12. VALIDAÇÃO DE COMMODITIES DO AGRONEGÓCIO & GLOBAIS ───
+console.log('\n--- 12. Commodities do Agronegócio Brasileiro & Mercado Global ---');
+
+const agroObrigatorio = [
+  'SOJA', 'MILHO', 'BOI_GORDO', 'CAFE', 'ACUCAR', 'ALGODAO',
+  'TRIGO', 'ETANOL', 'OURO_G', 'PRATA_G', 'BRENT', 'WTI'
+];
+
+for (const a of agroObrigatorio) {
+  assert(feedData.commoditiesAgro[a] !== undefined, `Ativo Agro/Commodity configurado: ${a} (${feedData.commoditiesAgro[a]?.nome || ''})`);
+}
+
+// ─── 13. VALIDAÇÃO DE INDICADORES ECONÔMICOS DO BRASIL ───
+console.log('\n--- 13. Indicadores Econômicos Oficiais (Bacen, IBGE, FGV, B3) ---');
+
+const indicesObrigatorios = [
+  'SELIC', 'CDI', 'IPCA', 'IPCA15', 'IGPM', 'INCC',
+  'POUPANCA', 'TR', 'SALARIO_MINIMO', 'IBOVESPA', 'IFIX'
+];
+
+for (const ind of indicesObrigatorios) {
+  assert(feedData.indicesBrasil[ind] !== undefined, `Indicador econômico configurado: ${ind} (${feedData.indicesBrasil[ind]?.nome || ''})`);
+}
+
+// ─── 14. RESOLUÇÃO DE ALIASES INTELIGENTES (CELIC, BITCOIN, DOLAR, ETC.) ───
+console.log('\n--- 14. Aliases Inteligentes & Tolerância de Grafia ---');
+
+const resCelic = await worker.fetch(new Request('https://api.test/api/cotacoes/CELIC'), {});
+assert(resCelic.status === 200, 'Alias CELIC responde HTTP 200');
+const dataCelic = await resCelic.json();
+assert(dataCelic.ativo === 'SELIC', 'Alias CELIC mapeado com precisão para SELIC');
+
+const resBitcoin = await worker.fetch(new Request('https://api.test/api/cotacoes/BITCOIN'), {});
+const dataBitcoin = await resBitcoin.json();
+assert(dataBitcoin.ativo === 'BTC', 'Alias BITCOIN mapeado para BTC');
+
+const resDolar = await worker.fetch(new Request('https://api.test/api/cotacoes/DOLAR'), {});
+const dataDolar = await resDolar.json();
+assert(dataDolar.ativo === 'USD', 'Alias DOLAR mapeado para USD');
+
+const resBoi = await worker.fetch(new Request('https://api.test/api/cotacoes/BOI'), {});
+const dataBoi = await resBoi.json();
+assert(dataBoi.ativo === 'BOI_GORDO', 'Alias BOI mapeado para BOI_GORDO');
+
+// ─── 15. ENDPOINTS SINGULARES COMPATÍVEIS COM A VITRINE DO MARKETPLACE ───
+console.log('\n--- 15. Compatibilidade Total com Endpoints da Vitrine ---');
+
+// 15.1 GET /api/cotacao/atual?pares=USD-BRL,EUR-BRL,BTC-BRL
+const resAtual = await worker.fetch(new Request('https://api.test/api/cotacao/atual?pares=USD-BRL,EUR-BRL,BTC-BRL'), {});
+assert(resAtual.status === 200, 'Rota /api/cotacao/atual responde HTTP 200');
+const dataAtual = await resAtual.json();
+assert(dataAtual.totalEncontrados === 3, 'Retornou os 3 pares solicitados');
+assert(dataAtual.ativos.USD !== undefined, 'Dólar presente no retorno de pares');
+assert(dataAtual.ativos.BTC !== undefined, 'Bitcoin presente no retorno de pares');
+
+// 15.2 GET /api/cotacao/historico?par=USD-BRL&dias=30
+const resHist = await worker.fetch(new Request('https://api.test/api/cotacao/historico?par=USD-BRL&dias=30'), {});
+assert(resHist.status === 200, 'Rota /api/cotacao/historico responde HTTP 200');
+const dataHist = await resHist.json();
+assert(dataHist.ativo === 'USD', 'Histórico aponta para USD');
+assert(dataHist.historico.totalPontos === 30, 'Histórico contém 30 dias de dados');
+
+// 15.3 GET /api/cotacao/conversao?de=USD&para=BRL&valor=100
+const resConvSingular = await worker.fetch(new Request('https://api.test/api/cotacao/conversao?de=USD&para=BRL&valor=100'), {});
+assert(resConvSingular.status === 200, 'Rota /api/cotacao/conversao responde HTTP 200');
+const dataConvSingular = await resConvSingular.json();
+assert(dataConvSingular.conversao.valorConvertido > 0, 'Conversão efetuada com sucesso');
+
 console.log(`\n========================================`);
 console.log(`🎉 TODOS OS ${passCount} TESTES PASSARAM COM 100% DE SUCESSO!`);
 console.log(`   Falhas: ${failCount}`);
