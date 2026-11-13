@@ -52,6 +52,70 @@ export class CotacoesPro {
   }
 
   /**
+   * Obtém o Catálogo Estruturado de todos os 123 ativos
+   * @returns {Promise<Object>}
+   */
+  static async getCatalogo() {
+    const resp = await fetch(`${this.baseUrl}/api/cotacoes/catalogo`, {
+      method: 'GET',
+      headers: this._getHeaders()
+    });
+    if (!resp.ok) {
+      throw new Error(`Erro ao obter catálogo: HTTP ${resp.status}`);
+    }
+    return await resp.json();
+  }
+
+  /**
+   * Obtém a lista e contagem de categorias de ativos
+   * @returns {Promise<Object>}
+   */
+  static async getCategorias() {
+    const resp = await fetch(`${this.baseUrl}/api/cotacoes/categorias`, {
+      method: 'GET',
+      headers: this._getHeaders()
+    });
+    if (!resp.ok) {
+      throw new Error(`Erro ao obter categorias: HTTP ${resp.status}`);
+    }
+    return await resp.json();
+  }
+
+  /**
+   * Busca ativos em tempo real por termo ou palavra-chave
+   * @param {string} termo - Ex: 'dolar', 'soja', 'celic', 'bitcoin'
+   * @returns {Promise<Object>}
+   */
+  static async buscar(termo) {
+    if (!termo) throw new Error('Informe o termo de busca.');
+    const resp = await fetch(`${this.baseUrl}/api/cotacoes/busca?q=${encodeURIComponent(termo)}`, {
+      method: 'GET',
+      headers: this._getHeaders()
+    });
+    if (!resp.ok) {
+      return { ok: false, status: resp.status, resultados: [] };
+    }
+    return await resp.json();
+  }
+
+  /**
+   * Obtém todos os ativos de uma categoria específica
+   * @param {'fiat'|'crypto'|'agro'|'indices'} categoria
+   * @returns {Promise<Object>}
+   */
+  static async getByCategoria(categoria) {
+    const cat = String(categoria).toLowerCase();
+    const resp = await fetch(`${this.baseUrl}/api/cotacoes/${encodeURIComponent(cat)}`, {
+      method: 'GET',
+      headers: this._getHeaders()
+    });
+    if (!resp.ok) {
+      throw new Error(`Erro ao consultar categoria ${cat}: HTTP ${resp.status}`);
+    }
+    return await resp.json();
+  }
+
+  /**
    * Consulta a cotação de um ativo individual com histórico
    * @param {string} codigo - Ex: 'USD', 'EUR', 'BTC', 'SELIC', 'SOJA'
    * @param {Object} [options] - { periodo: '7d'|'30d'|'1a'|'5a'|'max', format: 'json'|'svg' }

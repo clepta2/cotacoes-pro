@@ -269,6 +269,82 @@ assert(resConvSingular.status === 200, 'Rota /api/cotacao/conversao responde HTT
 const dataConvSingular = await resConvSingular.json();
 assert(dataConvSingular.conversao.valorConvertido > 0, 'Conversão efetuada com sucesso');
 
+// ─── 16. CATÁLOGO GERAL ESTRUTURADO DE 123 ATIVOS (/api/cotacoes/catalogo) ───
+console.log('\n--- 16. Catálogo Geral Estruturado (123 Ativos) ---');
+
+const resCat = await worker.fetch(new Request('https://api.test/api/cotacoes/catalogo'), {});
+assert(resCat.status === 200, 'Rota /api/cotacoes/catalogo responde HTTP 200');
+const dataCat = await resCat.json();
+assert(dataCat.ok === true, 'Catálogo retorna ok: true');
+assert(dataCat.totalAtivos === 123, 'Catálogo consolida exatamente 123 ativos');
+assert(dataCat.catalogo.fiat.length === 44, 'Catálogo possui 44 moedas fiduciárias');
+assert(dataCat.catalogo.crypto.length === 34, 'Catálogo possui 34 criptomoedas');
+assert(dataCat.catalogo.commoditiesAgro.length === 24, 'Catálogo possui 24 commodities agropecuárias');
+assert(dataCat.catalogo.indicesBrasil.length === 21, 'Catálogo possui 21 indicadores e índices');
+
+// ─── 17. LISTAGEM DE CATEGORIAS E ROTAS DEDICADAS ───
+console.log('\n--- 17. Listagem de Categorias & Rotas Especializadas ---');
+
+const resCategorias = await worker.fetch(new Request('https://api.test/api/cotacoes/categorias'), {});
+assert(resCategorias.status === 200, 'Rota /api/cotacoes/categorias responde HTTP 200');
+const dataCategorias = await resCategorias.json();
+assert(dataCategorias.totalCategorias === 4, '4 macro-categorias disponíveis');
+
+const resCatFiat = await worker.fetch(new Request('https://api.test/api/cotacoes/fiat'), {});
+assert(resCatFiat.status === 200, 'Rota /api/cotacoes/fiat responde HTTP 200');
+const dataCatFiat = await resCatFiat.json();
+assert(dataCatFiat.total === 44, 'Rota fiat retorna 44 moedas');
+
+const resCatCrypto = await worker.fetch(new Request('https://api.test/api/cotacoes/crypto'), {});
+assert(resCatCrypto.status === 200, 'Rota /api/cotacoes/crypto responde HTTP 200');
+const dataCatCrypto = await resCatCrypto.json();
+assert(dataCatCrypto.total === 34, 'Rota crypto retorna 34 criptoativos');
+
+const resCatAgro = await worker.fetch(new Request('https://api.test/api/cotacoes/agro'), {});
+assert(resCatAgro.status === 200, 'Rota /api/cotacoes/agro responde HTTP 200');
+const dataCatAgro = await resCatAgro.json();
+assert(dataCatAgro.total === 24, 'Rota agro retorna 24 commodities');
+
+const resCatIndices = await worker.fetch(new Request('https://api.test/api/cotacoes/indices'), {});
+assert(resCatIndices.status === 200, 'Rota /api/cotacoes/indices responde HTTP 200');
+const dataCatIndices = await resCatIndices.json();
+assert(dataCatIndices.total === 21, 'Rota indices retorna 21 indicadores');
+
+// ─── 18. BUSCA INTELIGENTE DE ATIVOS (/api/cotacoes/busca?q=...) ───
+console.log('\n--- 18. Busca Inteligente de Ativos (?q=...) ---');
+
+const resBuscaDolar = await worker.fetch(new Request('https://api.test/api/cotacoes/busca?q=dolar'), {});
+assert(resBuscaDolar.status === 200, 'Busca por dolar responde HTTP 200');
+const dataBuscaDolar = await resBuscaDolar.json();
+assert(dataBuscaDolar.totalEncontrados >= 1, 'Localizou ativo na busca por dolar');
+
+const resBuscaSoja = await worker.fetch(new Request('https://api.test/api/cotacoes/busca?q=soja'), {});
+const dataBuscaSoja = await resBuscaSoja.json();
+assert(dataBuscaSoja.totalEncontrados >= 1, 'Localizou commodity na busca por soja');
+
+const resBuscaCelic = await worker.fetch(new Request('https://api.test/api/cotacoes/busca?q=celic'), {});
+const dataBuscaCelic = await resBuscaCelic.json();
+assert(dataBuscaCelic.totalEncontrados >= 1, 'Localizou indicador via alias celic');
+
+// ─── 19. PLANO STARTER 86.400 REQ/DIA (1 REQ/S 24/7) ───
+console.log('\n--- 19. Validação do Plano Starter 86.400 req/dia (1 req/s) ---');
+
+const resStarterCheck = await worker.fetch(new Request('https://api.test/api/cotacoes/USD', {
+  headers: { 'Authorization': 'Bearer cot_start_live_token' }
+}), {});
+assert(resStarterCheck.headers.get('x-cotacoes-daily-limit') === '86400', 'Plano starter possui cota diária de 86.400 requisições');
+assert(resStarterCheck.headers.get('x-cotacoes-window-daily') === '86400s', 'Janela diária oficial de 86.400 segundos');
+assert(resStarterCheck.headers.get('x-cotacoes-cadence') === '1 req/s contínuo 24/7', 'Cadência do plano starter é 1 req/s contínuo 24/7');
+
+// ─── 20. VALIDAÇÃO DOS NOVOS MÉTODOS DO SDK CotacoesPro ───
+console.log('\n--- 20. Novos Métodos do SDK Oficial CotacoesPro ---');
+
+assert(typeof CotacoesPro.getCatalogo === 'function', 'Método CotacoesPro.getCatalogo disponível');
+assert(typeof CotacoesPro.getCategorias === 'function', 'Método CotacoesPro.getCategorias disponível');
+assert(typeof CotacoesPro.buscar === 'function', 'Método CotacoesPro.buscar disponível');
+assert(typeof CotacoesPro.getByCategoria === 'function', 'Método CotacoesPro.getByCategoria disponível');
+assert(typeof CotacoesPro.getSvgTickerUrl === 'function', 'Método CotacoesPro.getSvgTickerUrl disponível');
+
 console.log(`\n========================================`);
 console.log(`🎉 TODOS OS ${passCount} TESTES PASSARAM COM 100% DE SUCESSO!`);
 console.log(`   Falhas: ${failCount}`);
