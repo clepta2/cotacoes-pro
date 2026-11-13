@@ -98,8 +98,62 @@ export interface BuscaResultado {
   atualizadoEm: string;
 }
 
+export interface HealthResultado {
+  ok: boolean;
+  servico: string;
+  status: 'HEALTHY' | 'DEGRADED';
+  uptimeSegundos: number;
+  latenciaBordaMs: number;
+  taxaEntrega: string;
+  totalAtivos: number;
+  resumo: Record<string, number>;
+  cacheRamStatus: string;
+  ttlCacheSegundos: number;
+  atualizadoEm: string;
+  provedor: string;
+}
+
+export interface RankingResultado {
+  ok: boolean;
+  servico: string;
+  maioresAltas: AtivoCotacao[];
+  maioresBaixas: AtivoCotacao[];
+  maisPopulares: AtivoCotacao[];
+  totalAtivosAnalisados: number;
+  atualizadoEm: string;
+}
+
+export interface SimulacaoItem {
+  montanteBruto: number;
+  lucroBruto: number;
+  irDevido: number;
+  aliquotaIr: string;
+  montanteLiquido: number;
+  rentabilidadeLiquidaPct: number;
+}
+
+export interface SimuladorResultado {
+  ok: boolean;
+  servico: string;
+  parametros: { valorInicial: number; periodoMeses: number };
+  indicadoresBase: { selicAnual: number; cdiAnual: number; ipcaAnual: number };
+  resultados: {
+    tesouroSelic: SimulacaoItem;
+    cdi100: SimulacaoItem;
+    poupanca: SimulacaoItem;
+    inflacaoAcumulada: number;
+    ganhoRealSelicSobrePoupanca: number;
+  };
+  atualizadoEm: string;
+}
+
 export class CotacoesPro {
   static getMasterFeed(): Promise<MasterFeed>;
+  static getHealth(): Promise<HealthResultado>;
+  static getRanking(): Promise<RankingResultado>;
+  static simularInvestimento(options?: { valor?: number; meses?: number }): Promise<SimuladorResultado>;
+  static par(de: string, para?: string): Promise<{ ok: boolean; par: string; origem: string; destino: string; cotacao: number; atualizadoEm: string }>;
+  static exportarCsv(alvo?: 'catalogo' | 'fiat' | 'crypto' | 'agro' | 'indices'): Promise<string>;
   static getCatalogo(): Promise<CatalogoResultado>;
   static getCategorias(): Promise<{ ok: boolean; totalCategorias: number; totalAtivos: number; categorias: CategoriaResumo[] }>;
   static buscar(termo: string): Promise<BuscaResultado>;

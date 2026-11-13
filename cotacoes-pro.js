@@ -52,6 +52,78 @@ export class CotacoesPro {
   }
 
   /**
+   * Obtém a telemetria e status de saúde do cluster Anycast
+   * @returns {Promise<Object>}
+   */
+  static async getHealth() {
+    const resp = await fetch(`${this.baseUrl}/api/cotacoes/health`, {
+      method: 'GET',
+      headers: this._getHeaders()
+    });
+    if (!resp.ok) throw new Error(`Erro ao consultar healthcheck: HTTP ${resp.status}`);
+    return await resp.json();
+  }
+
+  /**
+   * Obtém o ranking de mercado em tempo real (maiores altas, maiores baixas, mais populares)
+   * @returns {Promise<Object>}
+   */
+  static async getRanking() {
+    const resp = await fetch(`${this.baseUrl}/api/cotacoes/ranking`, {
+      method: 'GET',
+      headers: this._getHeaders()
+    });
+    if (!resp.ok) throw new Error(`Erro ao consultar ranking: HTTP ${resp.status}`);
+    return await resp.json();
+  }
+
+  /**
+   * Simula o rendimento comparativo de investimentos com tabela regressiva de IR
+   * @param {Object} [opts] - { valor?: number, meses?: number }
+   * @returns {Promise<Object>}
+   */
+  static async simularInvestimento({ valor = 10000, meses = 12 } = {}) {
+    const params = new URLSearchParams({ valor: String(valor), meses: String(meses) });
+    const resp = await fetch(`${this.baseUrl}/api/cotacoes/simulador?${params.toString()}`, {
+      method: 'GET',
+      headers: this._getHeaders()
+    });
+    if (!resp.ok) throw new Error(`Erro na simulação: HTTP ${resp.status}`);
+    return await resp.json();
+  }
+
+  /**
+   * Consulta direta de par cruzado REST
+   * @param {string} de - Ex: 'USD'
+   * @param {string} para - Ex: 'BRL', 'EUR'
+   * @returns {Promise<Object>}
+   */
+  static async par(de, para = 'BRL') {
+    if (!de) throw new Error('Informe o ativo de origem.');
+    const resp = await fetch(`${this.baseUrl}/api/cotacoes/${encodeURIComponent(de)}/${encodeURIComponent(para)}`, {
+      method: 'GET',
+      headers: this._getHeaders()
+    });
+    if (!resp.ok) throw new Error(`Erro ao consultar par ${de}/${para}: HTTP ${resp.status}`);
+    return await resp.json();
+  }
+
+  /**
+   * Exporta dados em formato CSV para integração com Excel e Google Sheets
+   * @param {'catalogo'|'fiat'|'crypto'|'agro'|'indices'} [alvo='catalogo']
+   * @returns {Promise<string>}
+   */
+  static async exportarCsv(alvo = 'catalogo') {
+    const endpoint = alvo === 'catalogo' ? '/api/cotacoes/catalogo?formato=csv' : `/api/cotacoes/${encodeURIComponent(alvo)}?formato=csv`;
+    const resp = await fetch(`${this.baseUrl}${endpoint}`, {
+      method: 'GET',
+      headers: this._getHeaders()
+    });
+    if (!resp.ok) throw new Error(`Erro ao exportar CSV: HTTP ${resp.status}`);
+    return await resp.text();
+  }
+
+  /**
    * Obtém o Catálogo Estruturado de todos os 123 ativos
    * @returns {Promise<Object>}
    */

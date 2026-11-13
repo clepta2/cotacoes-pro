@@ -269,18 +269,18 @@ assert(resConvSingular.status === 200, 'Rota /api/cotacao/conversao responde HTT
 const dataConvSingular = await resConvSingular.json();
 assert(dataConvSingular.conversao.valorConvertido > 0, 'Conversão efetuada com sucesso');
 
-// ─── 16. CATÁLOGO GERAL ESTRUTURADO DE 123 ATIVOS (/api/cotacoes/catalogo) ───
-console.log('\n--- 16. Catálogo Geral Estruturado (123 Ativos) ---');
+// ─── 16. CATÁLOGO GERAL ESTRUTURADO DE 170 ATIVOS (/api/cotacoes/catalogo) ───
+console.log('\n--- 16. Catálogo Geral Estruturado (170 Ativos) ---');
 
 const resCat = await worker.fetch(new Request('https://api.test/api/cotacoes/catalogo'), {});
 assert(resCat.status === 200, 'Rota /api/cotacoes/catalogo responde HTTP 200');
 const dataCat = await resCat.json();
 assert(dataCat.ok === true, 'Catálogo retorna ok: true');
-assert(dataCat.totalAtivos === 123, 'Catálogo consolida exatamente 123 ativos');
-assert(dataCat.catalogo.fiat.length === 44, 'Catálogo possui 44 moedas fiduciárias');
-assert(dataCat.catalogo.crypto.length === 34, 'Catálogo possui 34 criptomoedas');
-assert(dataCat.catalogo.commoditiesAgro.length === 24, 'Catálogo possui 24 commodities agropecuárias');
-assert(dataCat.catalogo.indicesBrasil.length === 21, 'Catálogo possui 21 indicadores e índices');
+assert(dataCat.totalAtivos === 170, 'Catálogo consolida exatamente 170 ativos');
+assert(dataCat.catalogo.fiat.length === 64, 'Catálogo possui 64 moedas fiduciárias');
+assert(dataCat.catalogo.crypto.length === 48, 'Catálogo possui 48 criptomoedas');
+assert(dataCat.catalogo.commoditiesAgro.length === 32, 'Catálogo possui 32 commodities agropecuárias');
+assert(dataCat.catalogo.indicesBrasil.length === 26, 'Catálogo possui 26 indicadores e índices');
 
 // ─── 17. LISTAGEM DE CATEGORIAS E ROTAS DEDICADAS ───
 console.log('\n--- 17. Listagem de Categorias & Rotas Especializadas ---');
@@ -293,22 +293,22 @@ assert(dataCategorias.totalCategorias === 4, '4 macro-categorias disponíveis');
 const resCatFiat = await worker.fetch(new Request('https://api.test/api/cotacoes/fiat'), {});
 assert(resCatFiat.status === 200, 'Rota /api/cotacoes/fiat responde HTTP 200');
 const dataCatFiat = await resCatFiat.json();
-assert(dataCatFiat.total === 44, 'Rota fiat retorna 44 moedas');
+assert(dataCatFiat.total === 64, 'Rota fiat retorna 64 moedas');
 
 const resCatCrypto = await worker.fetch(new Request('https://api.test/api/cotacoes/crypto'), {});
 assert(resCatCrypto.status === 200, 'Rota /api/cotacoes/crypto responde HTTP 200');
 const dataCatCrypto = await resCatCrypto.json();
-assert(dataCatCrypto.total === 34, 'Rota crypto retorna 34 criptoativos');
+assert(dataCatCrypto.total === 48, 'Rota crypto retorna 48 criptoativos');
 
 const resCatAgro = await worker.fetch(new Request('https://api.test/api/cotacoes/agro'), {});
 assert(resCatAgro.status === 200, 'Rota /api/cotacoes/agro responde HTTP 200');
 const dataCatAgro = await resCatAgro.json();
-assert(dataCatAgro.total === 24, 'Rota agro retorna 24 commodities');
+assert(dataCatAgro.total === 32, 'Rota agro retorna 32 commodities');
 
 const resCatIndices = await worker.fetch(new Request('https://api.test/api/cotacoes/indices'), {});
 assert(resCatIndices.status === 200, 'Rota /api/cotacoes/indices responde HTTP 200');
 const dataCatIndices = await resCatIndices.json();
-assert(dataCatIndices.total === 21, 'Rota indices retorna 21 indicadores');
+assert(dataCatIndices.total === 26, 'Rota indices retorna 26 indicadores');
 
 // ─── 18. BUSCA INTELIGENTE DE ATIVOS (/api/cotacoes/busca?q=...) ───
 console.log('\n--- 18. Busca Inteligente de Ativos (?q=...) ---');
@@ -344,6 +344,86 @@ assert(typeof CotacoesPro.getCategorias === 'function', 'Método CotacoesPro.get
 assert(typeof CotacoesPro.buscar === 'function', 'Método CotacoesPro.buscar disponível');
 assert(typeof CotacoesPro.getByCategoria === 'function', 'Método CotacoesPro.getByCategoria disponível');
 assert(typeof CotacoesPro.getSvgTickerUrl === 'function', 'Método CotacoesPro.getSvgTickerUrl disponível');
+assert(typeof CotacoesPro.getHealth === 'function', 'Método CotacoesPro.getHealth disponível');
+assert(typeof CotacoesPro.getRanking === 'function', 'Método CotacoesPro.getRanking disponível');
+assert(typeof CotacoesPro.simularInvestimento === 'function', 'Método CotacoesPro.simularInvestimento disponível');
+assert(typeof CotacoesPro.par === 'function', 'Método CotacoesPro.par disponível');
+assert(typeof CotacoesPro.exportarCsv === 'function', 'Método CotacoesPro.exportarCsv disponível');
+
+// ─── 21. HEALTHCHECK E TELEMETRIA DO CLUSTER (/api/cotacoes/health) ───
+console.log('\n--- 21. Healthcheck & Telemetria do Cluster Anycast ---');
+
+const masterHeader = { 'Authorization': 'Bearer cot_master_full_test_suite' };
+
+const resHealth = await worker.fetch(new Request('https://api.test/api/cotacoes/health', { headers: masterHeader }), {});
+assert(resHealth.status === 200, 'Rota /api/cotacoes/health responde HTTP 200');
+const dataHealth = await resHealth.json();
+assert(dataHealth.status === 'HEALTHY', 'Status do cluster é HEALTHY');
+assert(dataHealth.totalAtivos === 170, 'Healthcheck reporta 170 ativos ativos');
+assert(dataHealth.latenciaBordaMs < 10, 'Latência de borda é sub-1s (<10ms)');
+
+// ─── 22. RANKING DE MERCADO EM TEMPO REAL (/api/cotacoes/ranking) ───
+console.log('\n--- 22. Ranking de Mercado em Tempo Real ---');
+
+const resRank = await worker.fetch(new Request('https://api.test/api/cotacoes/ranking', { headers: masterHeader }), {});
+assert(resRank.status === 200, 'Rota /api/cotacoes/ranking responde HTTP 200');
+const dataRank = await resRank.json();
+assert(dataRank.ok === true, 'Ranking retorna ok: true');
+assert(Array.isArray(dataRank.maioresAltas) && dataRank.maioresAltas.length > 0, 'Possui lista de maiores altas');
+assert(Array.isArray(dataRank.maioresBaixas) && dataRank.maioresBaixas.length > 0, 'Possui lista de maiores baixas');
+assert(Array.isArray(dataRank.maisPopulares) && dataRank.maisPopulares.length > 0, 'Possui lista de ativos populares');
+
+// ─── 23. SIMULADOR DE INVESTIMENTOS & IR REGRESSIVO (/api/cotacoes/simulador) ───
+console.log('\n--- 23. Simulador de Investimentos & Renda Fixa ---');
+
+const resSim = await worker.fetch(new Request('https://api.test/api/cotacoes/simulador?valor=10000&meses=12', { headers: masterHeader }), {});
+assert(resSim.status === 200, 'Rota /api/cotacoes/simulador responde HTTP 200');
+const dataSim = await resSim.json();
+assert(dataSim.ok === true, 'Simulador retorna ok: true');
+assert(dataSim.resultados.tesouroSelic.montanteLiquido > 10000, 'Selic gera lucro líquido positivo');
+assert(dataSim.resultados.tesouroSelic.aliquotaIr === '20.0%', 'Alíquota de 12 meses é 20%');
+assert(dataSim.resultados.poupanca.aliquotaIr === 'Isento', 'Poupança é isenta de IR');
+assert(dataSim.resultados.ganhoRealSelicSobrePoupanca !== undefined, 'Calcula ganho real sobre a poupança');
+
+// ─── 24. COTAÇÃO CRUZADA DIRETA REST (/api/cotacoes/:de/:para) ───
+console.log('\n--- 24. Cotação Cruzada Direta REST ---');
+
+const resCruzado = await worker.fetch(new Request('https://api.test/api/cotacoes/USD/BRL', { headers: masterHeader }), {});
+assert(resCruzado.status === 200, 'Rota /api/cotacoes/USD/BRL responde HTTP 200');
+const dataCruzado = await resCruzado.json();
+assert(dataCruzado.par === 'USD/BRL', 'Par identificado como USD/BRL');
+assert(dataCruzado.cotacao > 0, `Cotação USD/BRL válida: ${dataCruzado.cotacao}`);
+
+const resCruzadoEurUsd = await worker.fetch(new Request('https://api.test/api/cotacoes/EUR/USD', { headers: masterHeader }), {});
+assert(resCruzadoEurUsd.status === 200, 'Rota /api/cotacoes/EUR/USD responde HTTP 200');
+const dataEurUsd = await resCruzadoEurUsd.json();
+assert(dataEurUsd.par === 'EUR/USD', 'Par EUR/USD calculado');
+assert(dataEurUsd.cotacao > 0, `Taxa EUR/USD válida: ${dataEurUsd.cotacao}`);
+
+// ─── 25. FORMATOS DE EXPORTAÇÃO ALTERNATIVOS (CSV & XML) ───
+console.log('\n--- 25. Exportação Multi-Formato (CSV & XML) ---');
+
+const resCsv = await worker.fetch(new Request('https://api.test/api/cotacoes/catalogo?formato=csv', { headers: masterHeader }), {});
+assert(resCsv.status === 200, 'Exportação CSV responde HTTP 200');
+assert(resCsv.headers.get('Content-Type').includes('text/csv'), 'Content-Type é text/csv');
+const textCsv = await resCsv.text();
+assert(textCsv.includes('codigo,nome,categoria,cotacao'), 'CSV contém cabeçalho padrão');
+assert(textCsv.includes('USD') && textCsv.includes('BTC'), 'CSV lista USD e BTC');
+
+const resXml = await worker.fetch(new Request('https://api.test/api/cotacoes/catalogo?formato=xml', { headers: masterHeader }), {});
+assert(resXml.status === 200, 'Exportação XML responde HTTP 200');
+assert(resXml.headers.get('Content-Type').includes('application/xml'), 'Content-Type é application/xml');
+const textXml = await resXml.text();
+assert(textXml.includes('<?xml') && textXml.includes('<catalogoCotacoes'), 'XML formatado corretamente');
+
+// ─── 26. GRÁFICOS SVG COM TEMAS & PALETAS CUSTOMIZADAS ───
+console.log('\n--- 26. Gráficos SVG Anycast com Temas & Paletas ---');
+
+const resSvgLight = await worker.fetch(new Request('https://api.test/api/cotacoes/USD?formato=svg&tema=light&paleta=blue', { headers: masterHeader }), {});
+assert(resSvgLight.status === 200, 'SVG tema light responde HTTP 200');
+const textSvgLight = await resSvgLight.text();
+assert(textSvgLight.includes('#3b82f6'), 'SVG aplicou paleta blue (#3b82f6)');
+assert(textSvgLight.includes('#ffffff'), 'SVG aplicou background branco (#ffffff)');
 
 console.log(`\n========================================`);
 console.log(`🎉 TODOS OS ${passCount} TESTES PASSARAM COM 100% DE SUCESSO!`);

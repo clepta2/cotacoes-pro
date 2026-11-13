@@ -4,48 +4,46 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Edge Latency](https://img.shields.io/badge/Latency-%3C5ms%20(Sub--1s)-10b981.svg)](https://ponte.ozpro.com.br)
 [![Cloudflare Workers](https://img.shields.io/badge/Runtime-Cloudflare%20Edge%20Anycast-F38020.svg)](https://workers.cloudflare.com)
-[![Catálogo Total](https://img.shields.io/badge/Ativos%20Catalogados-123%20Ativos-8b5cf6.svg)](#-4-catálogo-geral-de-ativos-123-ativos-em-tempo-real)
+[![Catálogo Total](https://img.shields.io/badge/Ativos%20Catalogados-170%20Ativos-8b5cf6.svg)](#-4-catálogo-geral-de-ativos-170-ativos-em-tempo-real)
 [![Taxa de Entrega](https://img.shields.io/badge/Entrega-86.400%20req%2Fdia%20(1%20req%2Fs)-0ea5e9.svg)](#-2-arquitetura-de-vazão-86400-reqdia--1-reqs-contínuo)
 
-API de Alta Frequência e SDK Oficial de **Cotações Globais em Tempo Real, Câmbio de 44 Moedas Fiduciárias, 34 Criptomoedas e Bitcoins, 24 Commodities Agropecuárias e 21 Indicadores Econômicos Oficiais**.
+API de Alta Frequência e SDK Oficial de **Cotações Globais em Tempo Real: 64 Moedas Fiduciárias, 48 Criptomoedas e Bitcoins, 32 Commodities Agropecuárias e Mineração, e 26 Indicadores Econômicos Oficiais**.
 
-Projetada para atender aplicações críticas com **cadência contínua de 1 requisição por segundo (86.400 req/dia)** e entrega ultrarrápida na borda Cloudflare Anycast (<5ms de latência RAM).
+Projetada para aplicações corporativas, fintechs, e-commerces e planilhas com **cadência contínua garantida de 1 requisição por segundo (86.400 req/dia)** e entrega ultrarrápida na borda Cloudflare Anycast (<5ms de latência RAM).
 
 ---
 
 ## ⚡ 1. Destaques da Infraestrutura
 
-* **123 Ativos em Tempo Real**: 44 moedas mundiais, 34 criptoativos, 24 commodities agro e 21 índices oficiais do Bacen, IBGE, FGV e B3.
-* **Cadência de 1 req/s (86.400 req/dia)**: Proteção por isolate na borda Cloudflare com monitoramento duplo de janela (60s RPM e 86.400s diário).
-* **Endpoints Catalogados & Descoberta Ativa**: Rotas dedicadas de catálogo (`/catalogo`), busca em tempo real (`/busca?q=...`) e filtros por categoria (`/fiat`, `/crypto`, `/agro`, `/indices`).
-* **Micro-cache de Borda (3s)**: Respostas imediatas em RAM (<5ms) com proteção de upstream contra falhas de rede externa.
-* **Conversor Universal com IOF**: Conversão cruzada entre quaisquer moedas com alíquota fiscal personalizada.
-* **Gráficos Anycast Vetoriais SVG**: Mini-gráficos e badges gerados diretamente pela borda para tags `<img>` sem JavaScript no frontend.
+* **170 Ativos Consolidados**: 64 moedas mundiais (Américas, Europa, Ásia, África, CPLP, Oriente Médio), 48 criptoativos (BTC, ETH, SOL, BNB, etc.), 32 commodities agropecuárias (Cepea/Esalq/B3) e 26 índices oficiais (Bacen, IBGE, FGV, B3, S&P, Nasdaq).
+* **Cadência Contínua de 1 req/s (86.400 req/dia)**: Controle rígido de vazão por isolate na Cloudflare Edge com dupla janela (60s RPM e 86.400s diário).
+* **Ranking de Mercado em Tempo Real**: Endpoint com as maiores altas (Top Gainers), maiores baixas (Top Losers) e ativos mais populares.
+* **Simulador de Investimentos com IR Regressivo**: Cálculo financeiro comparativo entre Tesouro Selic, CDI 100%, Poupança e Inflação (IPCA), com alíquota regressiva oficial de IR.
+* **Cotações Cruzadas Diretas REST**: `GET /api/cotacoes/:de/:para` (ex: `/USD/BRL`, `/EUR/USD`, `/BTC/BRL`).
+* **Multi-Formato**: Saída nativa em **JSON**, **CSV** (integração direta com Excel e Google Sheets via `=IMPORTDATA`), **XML** e gráficos vetoriais **SVG**.
+* **Micro-cache de Borda (3s)**: Respostas sub-1s (<5ms) com proteção de upstream.
 
 ---
 
 ## ⏱️ 2. Arquitetura de Vazão: 86.400 req/dia & 1 req/s Contínuo
 
-A API foi projetada com base nos **86.400 segundos do dia**. A cadência do plano Starter entrega **1 requisição garantida a cada 1 segundo 24 horas por dia, 7 dias por semana**:
+$$\text{86.400 segundos por dia} \times 1\text{ requisição por segundo} = \mathbf{86.400\text{ requisições diárias}}$$
 
-$$\text{86.400 segundos / dia} \times 1\text{ req/s} = \mathbf{86.400\text{ requisições por dia}}$$
+O plano **Starter 86.400** garante que robôs, bots de arbitragem, e-commerces e sistemas contábeis possam efetuar **1 requisição a cada 1 segundo ininterruptamente durante as 24 horas do dia**:
 
-### Matriz Oficial de Planos
-
-| Plano | Vazão por Minuto | Cota Diária (86.400s) | Cadência Efetiva | Finalidade Recomendada |
+| Plano | Vazão (RPM / 60s) | Cota Diária (86.400s) | Cadência Efetiva | Finalidade Recomendada |
 |---|---|---|---|---|
-| 🟢 **Free / Sandbox** | 30 RPM | 500 req / dia | Testes & Dev | Prototipagem e desenvolvimento local |
+| 🟢 **Free / Sandbox** | 30 RPM | 500 req / dia | 0.5 req/s pico | Prototipagem e desenvolvimento |
 | 🔵 **Starter 86.400** | **60 RPM (1 req/s)** | **86.400 req / dia** | **1 req/s contínuo 24/7** | E-commerce, checkouts e robôs de cotação |
 | 🟣 **Pro** | 300 RPM (5 req/s) | 250.000 req / dia | 5 req/s contínuo | Fintechs, ERPs e portais de notícias |
 | 🟠 **Business Enterprise** | 1.200 RPM (20 req/s) | 1.000.000 req / dia | 20 req/s contínuo | Bancos, corretoras e alto volume institucional |
 | 🔴 **Master Admin** | 3.000 RPM (50 req/s) | Ilimitado (Infinity) | Vazão sem restrições | Gestão central de infraestrutura |
 
-### Cabeçalhos de Telemetria Retornados em 100% das Respostas
+### Telemetria HTTP em 100% das Respostas
 ```http
 x-cotacoes-plan: starter
 x-cotacoes-ratelimit-limit: 60
 x-cotacoes-ratelimit-remaining: 59
-x-cotacoes-ratelimit-reset: 1794589200
 x-cotacoes-daily-limit: 86400
 x-cotacoes-daily-remaining: 86399
 x-cotacoes-daily-reset: 1794675600
@@ -56,9 +54,7 @@ x-cotacoes-edge-delivery: sub-1s (Anycast RAM)
 
 ---
 
-## 🔑 3. Padrão de Autenticação (RFC 6750 Bearer & x-api-key)
-
-A autenticação é compatível com o padrão **RFC 6750 Bearer Token**, com o cabeçalho `x-api-key` ou via parâmetro na query string:
+## 🔑 3. Autenticação (RFC 6750 Bearer & x-api-key)
 
 ```http
 Authorization: Bearer cot_start_live_token123
@@ -67,285 +63,180 @@ Authorization: Bearer cot_start_live_token123
 
 ---
 
-## 📊 4. Catálogo Geral de Ativos (123 Ativos em Tempo Real)
+## 📊 4. Catálogo Geral de Ativos (170 Ativos em Tempo Real)
 
-### 🪙 A. 44 Moedas Fiduciárias Globais (Câmbio Comercial & Turismo)
-Rota especializada: `GET /api/cotacoes/fiat`
+### 🪙 A. 64 Moedas Fiduciárias Globais (Câmbio Comercial & Turismo)
+Rota especializada: `GET /api/cotacoes/fiat` (suporta `?formato=csv`)
 
-| Código | Nome da Moeda | País / Bloco | Tipo |
-|---|---|---|---|
-| `USD` | Dólar Americano Comercial | Estados Unidos | Comercial |
-| `USDTUR` | Dólar Americano Turismo | Estados Unidos | Turismo |
-| `EUR` | Euro Comercial | União Europeia | Comercial |
-| `EURTUR` | Euro Turismo | União Europeia | Turismo |
-| `GBP` | Libra Esterlina | Reino Unido | Comercial |
-| `JPY` | Iene Japonês | Japão | Comercial |
-| `CHF` | Franco Suíço | Suíça | Comercial |
-| `CAD` | Dólar Canadense | Canadá | Comercial |
-| `AUD` | Dólar Australiano | Austrália | Comercial |
-| `CNY` | Yuan Renminbi | China | Comercial |
-| `ARS` | Peso Argentino | Argentina | América Latina |
-| `CLP` | Peso Chileno | Chile | América Latina |
-| `COP` | Peso Colombiano | Colômbia | América Latina |
-| `UYU` | Peso Uruguaio | Uruguai | América Latina |
-| `PYG` | Guarani Paraguaio | Paraguai | América Latina |
-| `PEN` | Sol Peruano | Peru | América Latina |
-| `BOB` | Boliviano | Bolívia | América Latina |
-| `MXN` | Peso Mexicano | México | América Latina |
-| `CRC` | Colón Costa-Riquenho | Costa Rica | América Latina |
-| `VEF` | Bolívar Venezuelano | Venezuela | América Latina |
-| `INR` | Rúpia Indiana | Índia | Ásia |
-| `RUB` | Rublo Russo | Rússia | Europa/Ásia |
-| `ZAR` | Rand Sul-Africano | África do Sul | África |
-| `TRY` | Nova Lira Turca | Turquia | Europa/Ásia |
-| `ILS` | Novo Shekel Israelense | Israel | Oriente Médio |
-| `AED` | Dirham dos Emirados | Emirados Árabes | Oriente Médio |
-| `SAR` | Riyal Saudita | Arábia Saudita | Oriente Médio |
-| `SEK` | Coroa Sueca | Suécia | Escandinávia |
-| `NOK` | Coroa Norueguesa | Noruega | Escandinávia |
-| `DKK` | Coroa Dinamarquesa | Dinamarca | Escandinávia |
-| `PLN` | Zlóti Polonês | Polônia | Leste Europeu |
-| `NZD` | Dólar Neozelandês | Nova Zelândia | Oceania |
-| `SGD` | Dólar de Cingapura | Cingapura | Sudeste Asiático |
-| `HKD` | Dólar de Hong Kong | Hong Kong | Ásia |
-| `THB` | Baht Tailandês | Tailândia | Sudeste Asiático |
-| `TWD` | Dólar de Taiwan | Taiwan | Ásia |
-| `KRW` | Won Sul-Coreano | Coreia do Sul | Ásia |
-| `RON` | Leu Romeno | Romênia | Leste Europeu |
-| `EGP` | Libra Egípcia | Egito | África/Oriente Médio |
-| `KES` | Xelim Queniano | Quênia | África Oriental |
-| `PHP` | Peso Filipino | Filipinas | Sudeste Asiático |
-| `HUF` | Florim Húngaro | Hungria | Leste Europeu |
-| `CZK` | Coroa Tcheca | República Tcheca | Europa Central |
-| `RSD` | Dinar Sérvio | Sérvia | Leste Europeu |
+* **Américas (16)**: `USD` (Dólar Comercial), `USDTUR` (Dólar Turismo), `CAD` (Dólar Canadense), `MXN` (Peso Mexicano), `ARS` (Peso Argentino), `CLP` (Peso Chileno), `COP` (Peso Colombiano), `UYU` (Peso Uruguaio), `PYG` (Guarani Paraguaio), `PEN` (Sol Peruano), `BOB` (Boliviano), `CRC` (Colón Costa-Riquenho), `DOP` (Peso Dominicano), `GTQ` (Quetzal Guatemala), `HNL` (Lempira Honduras), `VEF` (Bolívar Venezuelano).
+* **Europa (17)**: `EUR` (Euro Comercial), `EURTUR` (Euro Turismo), `GBP` (Libra Esterlina), `CHF` (Franco Suíço), `SEK` (Coroa Sueca), `NOK` (Coroa Norueguesa), `DKK` (Coroa Dinamarquesa), `PLN` (Zlóti Polonês), `CZK` (Coroa Tcheca), `HUF` (Florim Húngaro), `RON` (Leu Romeno), `RSD` (Dinar Sérvio), `RUB` (Rublo Russo), `ISK` (Coroa Islandesa), `BGN` (Lev Búlgaro), `ALL` (Lek Albanês), `BAM` (Marco da Bósnia).
+* **Ásia & Oceania (16)**: `JPY` (Iene Japonês), `CNY` (Yuan Chinês), `INR` (Rúpia Indiana), `KRW` (Won Sul-Coreano), `SGD` (Dólar de Cingapura), `HKD` (Dólar de Hong Kong), `TWD` (Dólar de Taiwan), `THB` (Baht Tailandês), `PHP` (Peso Filipino), `AUD` (Dólar Australiano), `NZD` (Dólar Neozelandês), `IDR` (Rúpia Indonésia), `VND` (Dong Vietnamita), `MYR` (Ringgit Malásia), `PKR` (Rúpia Paquistanesa), `BDT` (Taka Bangladesh).
+* **Oriente Médio (8)**: `ILS` (Novo Shekel Israelense), `AED` (Dirham dos Emirados), `SAR` (Riyal Saudita), `TRY` (Nova Lira Turca), `QAR` (Rial do Catar), `KWD` (Dinar do Kuwait - maior valor global), `BHD` (Dinar do Bahrein), `OMR` (Rial de Omã).
+* **África & CPLP (7)**: `ZAR` (Rand Sul-Africano), `EGP` (Libra Egípcia), `KES` (Xelim Queniano), `AOA` (Kwanza Angolano), `MZN` (Metical Moçambicano), `CVE` (Escudo Cabo-Verdiano), `MAD` (Dirham Marroquino).
 
 ---
 
-### ⚡ B. 34 Criptomoedas e Criptoativos (Bitcoins, Altcoins & Stables)
-Rota especializada: `GET /api/cotacoes/crypto`
+### ⚡ B. 48 Criptomoedas e Criptoativos
+Rota especializada: `GET /api/cotacoes/crypto` (suporta `?formato=csv`)
 
-| Código | Nome do Criptoativo | Categoria | Paridade Spot |
-|---|---|---|---|
-| `BTC` | Bitcoin | Criptomoeda Líder (PoW) | BRL & USD |
-| `ETH` | Ethereum | Smart Contracts (PoS) | BRL & USD |
-| `SOL` | Solana | High-Speed Layer 1 | BRL & USD |
-| `BNB` | Binance Coin | Ecossistema BNB Chain | BRL & USD |
-| `USDT` | Tether USD | Stablecoin Centralizada (USD) | BRL & USD |
-| `USDC` | USD Coin (Circle) | Stablecoin Regulada (USD) | BRL & USD |
-| `DAI` | Dai Stablecoin (MakerDAO) | Stablecoin Descentralizada | BRL & USD |
-| `XRP` | Ripple | Pagamentos Transfronteiriços | BRL & USD |
-| `DOGE` | Dogecoin | Memecoin Líder (PoW) | BRL & USD |
-| `ADA` | Cardano | Proof-of-Stake L1 | BRL & USD |
-| `LTC` | Litecoin | Pagamentos P2P | BRL & USD |
-| `AVAX` | Avalanche | Consenso Subnet L1 | BRL & USD |
-| `DOT` | Polkadot | Interoperabilidade Multichain | BRL & USD |
-| `LINK` | Chainlink | Oráculo Descentralizado | BRL & USD |
-| `BCH` | Bitcoin Cash | Fork Bitcoin On-Chain P2P | BRL & USD |
-| `POL` | Polygon (ex-MATIC) | Ethereum Scaling L2 | BRL & USD |
-| `SHIB` | Shiba Inu | Memecoin & Ecossistema Shib | BRL & USD |
-| `TRX` | Tron | Transferência de USDT | BRL & USD |
-| `TON` | Toncoin (Telegram Open Net) | Layer 1 Integrada | BRL & USD |
-| `NEAR` | Near Protocol | Sharding L1 | BRL & USD |
-| `SUI` | Sui Network | Move Language L1 | BRL & USD |
-| `APT` | Aptos | Move Language L1 | BRL & USD |
-| `UNI` | Uniswap | DEX Líder DeFi | BRL & USD |
-| `PEPE` | Pepe Coin | Memecoin Ethereum | BRL & USD |
-| `RENDER`| Render Token | Computação GPU Distribuída | BRL & USD |
-| `FET` | Artificial Superintelligence | Inteligência Artificial (Fetch) | BRL & USD |
-| `ATOM` | Cosmos Hub | Internet das Blockchains | BRL & USD |
-| `XLM` | Stellar Lumens | Remessas Globais | BRL & USD |
-| `HBAR` | Hedera Hashgraph | Consenso Hashgraph | BRL & USD |
-| `KAS` | Kaspa | BlockDAG GHOSTDAG | BRL & USD |
-| `XMR` | Monero | Privacidade & Anonimato | BRL & USD |
-| `WIF` | dogwifhat | Memecoin Solana | BRL & USD |
-| `BONK` | Bonk | Memecoin da Comunidade Solana | BRL & USD |
-| `BRETT`| Brett | Memecoin Base Network | BRL & USD |
+* **Layer 1 & Principais**: `BTC` (Bitcoin), `ETH` (Ethereum), `SOL` (Solana), `BNB` (Binance Coin), `ADA` (Cardano), `AVAX` (Avalanche), `DOT` (Polkadot), `SUI` (Sui), `APT` (Aptos), `NEAR` (Near), `TON` (Toncoin), `ATOM` (Cosmos), `KAS` (Kaspa), `TRX` (Tron), `FTM` (Fantom), `ALGO` (Algorand), `SEI` (Sei), `TIA` (Celestia).
+* **Pagamentos & Privacidade**: `LTC` (Litecoin), `BCH` (Bitcoin Cash), `XRP` (Ripple), `XLM` (Stellar), `HBAR` (Hedera), `XMR` (Monero).
+* **DeFi, Oráculos & IA**: `LINK` (Chainlink), `UNI` (Uniswap), `AAVE` (Aave), `MKR` (Maker), `CRV` (Curve), `LDO` (Lido), `INJ` (Injective), `RUNE` (THORChain), `RENDER` (Render Token), `FET` (Artificial Superintelligence Alliance), `GRT` (The Graph), `STX` (Stacks Bitcoin L2).
+* **Stablecoins Pegadas**: `USDT` (Tether USD), `USDC` (USD Coin), `DAI` (Dai Stablecoin).
+* **Gaming & Metaverso**: `SAND` (The Sandbox), `MANA` (Decentraland).
+* **Memecoins**: `DOGE` (Dogecoin), `SHIB` (Shiba Inu), `PEPE` (Pepe Coin), `WIF` (dogwifhat), `BONK` (Bonk), `BRETT` (Brett).
 
 ---
 
-### 🌾 C. 24 Commodities Agropecuárias, Metais e Energia
-Rota especializada: `GET /api/cotacoes/agro`
+### 🌾 C. 32 Commodities Agropecuárias, Mineração, Metais & Energia
+Rota especializada: `GET /api/cotacoes/agro` (suporta `?formato=csv`)
 
-| Código | Produto / Commodity | Unidade Padrão | Fonte Oficial |
-|---|---|---|---|
-| `SOJA` | Soja em Grão | Saca 60kg | Cepea/Esalq |
-| `MILHO` | Milho Amarelo Tipo 1 | Saca 60kg | Cepea/Esalq |
-| `BOI_GORDO` | Arroba do Boi Gordo | Arroba (15kg) | Cepea/B3 |
-| `BEZERRO` | Bezerro Nelore | Cabeça | Cepea/Esalq |
-| `CAFE` | Café Arábica Tipo 6 | Saca 60kg | Cepea/B3 |
-| `CAFE_CONILON` | Café Conilon Tipo 7 | Saca 60kg | Cepea/Esalq |
-| `ACUCAR` | Açúcar Cristal Branco | Saca 50kg | Cepea/Esalq |
-| `ALGODAO` | Algodão em Pluma | Libra-peso (lb) | Cepea/Esalq |
-| `TRIGO` | Trigo em Grão (Paraná) | Tonelada | Cepea/Esalq |
-| `ARROZ` | Arroz em Casca | Saca 50kg | Cepea/IRGA |
-| `ETANOL` | Etanol Hidratado Combustível | Metro Cúbico ($m^3$) | Cepea/Esalq |
-| `ETANOL_ANIDRO`| Etanol Anidro | Metro Cúbico ($m^3$) | Cepea/Esalq |
-| `MANDIOCA` | Fécula de Mandioca | Tonelada | Cepea/Esalq |
-| `SUINO` | Suíno Vivo | Quilo (kg) | Cepea/Esalq |
-| `FRANGO` | Frango Congelado | Quilo (kg) | Cepea/Esalq |
-| `LEITE` | Leite Cru ao Produtor | Litro | Cepea/Esalq |
-| `OURO_G` | Ouro 24K Puro | Grama (g) | B3 Spot / Comex |
-| `PRATA_G` | Prata 999 | Grama (g) | Comex Spot |
-| `PLATINA` | Platina Comercial | Onça Troy ($oz\,t$) | NYMEX Nova York |
-| `PALADIO` | Paládio Puro | Onça Troy ($oz\,t$) | NYMEX Nova York |
-| `COBRE` | Cobre Comercial | Libra-peso (lb) | Comex Nova York |
-| `BRENT` | Petróleo Barril Brent | Barril (159L) | ICE Londres |
-| `WTI` | Petróleo Barril WTI | Barril (159L) | NYMEX Nova York |
-| `GAS_NATURAL` | Gás Natural Henry Hub | MMBtu | NYMEX Nova York |
+* **Grãos, Fibras & Hortifrúti (12)**: `SOJA` (Saca 60kg - Cepea), `MILHO` (Saca 60kg - Cepea), `TRIGO` (Tonelada - Cepea), `ARROZ` (Saca 50kg - Cepea), `ALGODAO` (Libra-peso - Cepea), `SORGO` (Saca 60kg - Cepea), `BATATA` (Saca 50kg - Ceagesp), `CEBOLA` (Saca 20kg - Ceagesp), `TOMATE` (Caixa 20kg - Ceagesp), `ETANOL` (Hidratado $m^3$ - Cepea), `ETANOL_ANIDRO` (Anidro $m^3$ - Cepea), `MANDIOCA` (Fécula Tonelada - Cepea).
+* **Pecuária, Proteína & Avicultura (6)**: `BOI_GORDO` (Arroba 15kg - Cepea/B3), `BEZERRO` (Cabeça Nelore - Cepea), `SUINO` (Quilo vivo - Cepea), `FRANGO` (Quilo congelado - Cepea), `LEITE` (Litro cru - Cepea), `OVOS` (Caixa 30 dúzias - Cepea).
+* **Café, Açúcar & Fertilizantes (4)**: `CAFE` (Arábica Tipo 6 saca 60kg - Cepea/B3), `CAFE_CONILON` (Conilon Tipo 7 saca 60kg - Cepea), `ACUCAR` (Cristal saca 50kg - Cepea), `UREIA` (Fertilizante Granulado Tonelada).
+* **Metais Preciosos, Industriais & Mineração (7)**: `OURO_G` (Ouro 24K Grama - B3 Spot), `PRATA_G` (Prata 999 Grama), `PLATINA` (Onça Troy - NYMEX), `PALADIO` (Onça Troy - NYMEX), `COBRE` (Libra-peso - Comex), `MINERIO_FERRO` (Minério 62% Fe CFR Qingdao Tonelada), `LITIO` (Carbonato de Lítio Tonelada).
+* **Energia & Combustíveis (3)**: `BRENT` (Petróleo Barril - ICE Londres), `WTI` (Petróleo Barril - NYMEX Nova York), `GAS_NATURAL` (Henry Hub MMBtu).
 
 ---
 
-### 📈 D. 21 Indicadores Econômicos Oficiais & Bolsas de Valores
-Rota especializada: `GET /api/cotacoes/indices`
+### 📈 D. 26 Indicadores Econômicos Oficiais, Juros & Bolsas
+Rota especializada: `GET /api/cotacoes/indices` (suporta `?formato=csv`)
 
-| Código | Indicador Econômico | Unidade | Fonte Primária |
-|---|---|---|---|
-| `SELIC` | Taxa Selic Over *(aceita alias `CELIC`)* | % ao ano | Banco Central do Brasil |
-| `CDI` | Taxa CDI Anualizada | % ao ano | B3 |
-| `IPCA` | Inflação Oficial IPCA | % acum. 12 meses | IBGE |
-| `IPCA15` | Prévia da Inflação IPCA-15 | % acum. 12 meses | IBGE |
-| `IGPM` | IGP-M (Reajuste de Aluguéis) | % acum. 12 meses | Fundação Getulio Vargas (FGV) |
-| `IGPDI` | IGP-DI Disponibilidade Interna | % acum. 12 meses | Fundação Getulio Vargas (FGV) |
-| `INCC` | INCC (Custo da Construção Civil) | % acum. 12 meses | FGV |
-| `IPCFIPE` | IPC-Fipe (Inflação de São Paulo) | % acum. 12 meses | Fipe |
-| `POUPANCA` | Rendimento Mensal da Poupança | % ao mês | Banco Central |
-| `TR` | Taxa Referencial Diária | % diário | Banco Central |
-| `TLP` | Taxa de Longo Prazo BNDES | % a.a. + IPCA | BNDES |
-| `TJLP` | Taxa de Juros de Longo Prazo | % ao ano | Banco Central |
-| `SALARIO_MINIMO` | Salário Mínimo Nacional (R$ 1.412) | Moeda Corrente (R$) | Governo Federal |
-| `IBOVESPA` | Índice Bovespa *(aceita `IBOV`)* | Pontos | B3 |
-| `IFIX` | Índice de Fundos Imobiliários | Pontos | B3 |
-| `SMLL` | Índice de Small Caps | Pontos | B3 |
-| `IDIV` | Índice de Dividendos | Pontos | B3 |
-| `BDRX` | Índice de BDRs Não Patrocinados | Pontos | B3 |
-| `SP500` | S&P 500 Index (Estados Unidos) | Pontos | S&P Dow Jones Indices |
-| `NASDAQ` | Nasdaq Composite (Estados Unidos) | Pontos | The Nasdaq Stock Market |
-| `DOWJONES` | Dow Jones Industrial Average | Pontos | Dow Jones Indexes |
+* **Taxas de Juros & Crédito**: `SELIC` (Taxa Selic Over % a.a. - Bacen - aceita alias `CELIC`), `SELIC_META` (Meta Copom), `CDI` (Taxa CDI Anualizada B3), `JUROS_REAIS` (Juros Reais ex-ante), `TR` (Taxa Referencial Diária), `TLP` (Taxa Longo Prazo BNDES), `TJLP` (Taxa Juros Longo Prazo).
+* **Inflação & Custos**: `IPCA` (Inflação Oficial IBGE % acum. 12m), `IPCA15` (Prévia IPCA-15 IBGE), `IGPM` (Reajuste Aluguéis FGV), `IGPDI` (IGP-DI FGV), `INCC` (Custo Construção FGV), `IPCFIPE` (Inflação Fipe São Paulo).
+* **Indicadores Sociais & Macroeconomia**: `POUPANCA` (Rendimento Poupança % a.m.), `SALARIO_MINIMO` (Salário Mínimo R$ 1.412), `PIB_BR` (Crescimento Anual PIB), `DIVIDA_PIB` (Dívida Bruta/PIB %), `RISCO_BRASIL` (CDS 5 Anos Brasil Pontos).
+* **Bolsa de Valores B3**: `IBOVESPA` (Ibovespa Pontos), `IFIX` (Fundos Imobiliários), `SMLL` (Small Caps), `IDIV` (Dividendos), `BDRX` (BDRs Não Patrocinados).
+* **Bolsas Globais**: `SP500` (S&P 500 EUA), `NASDAQ` (Nasdaq Composite EUA), `DOWJONES` (Dow Jones Industrial EUA).
 
 ---
 
-## 🔌 5. Endpoints Catalogados & Exemplos de Chamada
+## 🔌 5. Guia Completo de Endpoints Catalogados
 
-Todos os endpoints são servidos diretamente pela borda Cloudflare Anycast e aceitam rotas no plural e no singular.
-
-### 📋 1. Catálogo Estruturado
-Retorna a lista completa dos 123 ativos divididos por categoria com metadados:
+### 1. Healthcheck do Cluster Anycast
 ```bash
-curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/catalogo" \
-  -H "Authorization: Bearer cot_start_live_token123"
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/health"
 ```
 
-### 🔍 2. Busca Inteligente em Tempo Real
-Localiza ativos por nome, código ou palavra-chave (ex: "dolar", "soja", "celic", "bitcoin", "ouro"):
+### 2. Ranking de Mercado (Top Gainers & Losers)
 ```bash
-curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/busca?q=dolar" \
-  -H "Authorization: Bearer cot_start_live_token123"
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/ranking"
 ```
 
-### 📦 3. Consulta de Múltiplos Pares em Lote
-Consulta até dezenas de ativos em uma única requisição HTTP:
+### 3. Simulador de Investimentos (Selic vs CDI vs Poupança com IR)
 ```bash
-curl -X GET "https://ponte.ozpro.com.br/api/cotacao/atual?pares=USD-BRL,EUR-BRL,BTC-BRL,SELIC,SOJA" \
-  -H "Authorization: Bearer cot_start_live_token123"
+# Simula R$ 10.000 investidos por 12 meses
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/simulador?valor=10000&meses=12"
 ```
 
-### 🎯 4. Consulta de Ativo Individual & Série Histórica
+### 4. Cotação Cruzada Direta REST
 ```bash
-# Consulta Dólar com histórico de 30 dias
-curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/USD?periodo=30d" \
-  -H "Authorization: Bearer cot_start_live_token123"
+# Dólar para Real
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/USD/BRL"
 
-# Histórico 'MAX' desde o Plano Real (1994)
-curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/USD?periodo=max" \
-  -H "Authorization: Bearer cot_start_live_token123"
+# Euro para Dólar Americano
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/EUR/USD"
 
-# Consulta Taxa Selic (aceita alias CELIC)
-curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/CELIC" \
-  -H "Authorization: Bearer cot_start_live_token123"
+# Bitcoin para Real
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/BTC/BRL"
 ```
 
-### 💱 5. Conversor Universal de Moedas com IOF
-Converte qualquer par de moedas calculando automaticamente imposto IOF e arredondamento fiscal:
+### 5. Catálogo Completo Estruturado
 ```bash
-curl -X GET "https://ponte.ozpro.com.br/api/cotacao/conversao?de=USD&para=BRL&valor=250&iof=4.38" \
-  -H "Authorization: Bearer cot_start_live_token123"
+# JSON
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/catalogo"
+
+# Exportar direto em CSV para Excel
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/catalogo?formato=csv"
 ```
 
-### 🎨 6. Gráficos Vetoriais SVG Anycast (<3ms)
-Embed direto em websites sem JavaScript:
+### 6. Busca em Tempo Real
+```bash
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/busca?q=ouro"
+curl -X GET "https://ponte.ozpro.com.br/api/cotacoes/busca?q=celic"
+```
+
+### 7. Consulta Múltipla em Lote
+```bash
+curl -X GET "https://ponte.ozpro.com.br/api/cotacao/atual?pares=USD-BRL,BTC-BRL,SELIC,SOJA,OURO_G"
+```
+
+### 8. Conversor Universal com Cálculo Fiscal de IOF
+```bash
+curl -X GET "https://ponte.ozpro.com.br/api/cotacao/conversao?de=USD&para=BRL&valor=250&iof=4.38"
+```
+
+### 9. Gráficos Vetoriais SVG Anycast com Temas e Paletas
 ```html
-<img src="https://ponte.ozpro.com.br/api/cotacoes/BTC?formato=svg&periodo=30d" width="580" height="240" alt="Gráfico Bitcoin" />
+<!-- Tema escuro padrão com paleta emerald -->
+<img src="https://ponte.ozpro.com.br/api/cotacoes/BTC?formato=svg&periodo=30d" width="580" height="240" />
+
+<!-- Tema claro com paleta azul para sites claros -->
+<img src="https://ponte.ozpro.com.br/api/cotacoes/USD?formato=svg&tema=light&paleta=blue" width="580" height="240" />
 ```
 
 ---
 
-## 💻 6. Exemplos de Uso em Código
+## 📊 6. Integração com Google Sheets & Excel
 
-### 🔹 Node.js (SDK Oficial CotacoesPro)
+Você pode sincronizar as cotações em tempo real nas suas planilhas usando a fórmula nativa:
+
+### Google Sheets
+Coloque na célula `A1`:
+```excel
+=IMPORTDATA("https://ponte.ozpro.com.br/api/cotacoes/fiat?formato=csv")
+```
+
+Para consultar o Dólar diretamente em uma célula:
+```excel
+=INDEX(IMPORTDATA("https://ponte.ozpro.com.br/api/cotacoes/USD?formato=csv"), 2, 4)
+```
+
+---
+
+## 💻 7. Exemplos de Uso em Código
+
+### 🔹 Node.js / TypeScript (SDK Oficial)
 ```javascript
 import { CotacoesPro } from 'cotacoes-pro';
 
-CotacoesPro.configure({
-  apiKey: 'cot_start_live_token123'
-});
+CotacoesPro.configure({ apiKey: 'cot_start_live_token123' });
 
-// 1. Obter catálogo completo estruturado (123 ativos)
-const catalogo = await CotacoesPro.getCatalogo();
-console.log(`Total de ativos: ${catalogo.totalAtivos}`);
+// 1. Simular investimento de R$ 50.000 por 24 meses
+const sim = await CotacoesPro.simularInvestimento({ valor: 50000, meses: 24 });
+console.log('Lucro Líquido Selic:', sim.resultados.tesouroSelic.montanteLiquido);
 
-// 2. Busca inteligente por termo
-const busca = await CotacoesPro.buscar('soja');
-console.log(busca.resultados);
+// 2. Ranking de mercado
+const rank = await CotacoesPro.getRanking();
+console.log('Maiores altas:', rank.maioresAltas);
 
-// 3. Consulta de ativo com histórico
-const usd = await CotacoesPro.consultar('USD', { periodo: '30d' });
-console.log(`Dólar: R$ ${usd.dados.cotacao} (${usd.historico.variacaoPeriodo})`);
+// 3. Cotação cruzada direta
+const par = await CotacoesPro.par('EUR', 'USD');
+console.log(`1 EUR = ${par.cotacao} USD`);
 
-// 4. Conversão com IOF
-const conv = await CotacoesPro.converter({ de: 'USD', para: 'BRL', valor: 100, iof: 4.38 });
-console.log(`Total com IOF: R$ ${conv.conversao.totalFinalComIof}`);
+// 4. Exportar CSV
+const csv = await CotacoesPro.exportarCsv('agro');
 ```
 
 ### 🔹 Python (requests)
 ```python
 import requests
 
-headers = {
-    "Authorization": "Bearer cot_start_live_token123"
-}
+headers = { "Authorization": "Bearer cot_start_live_token123" }
 
-# Consultar múltiplos ativos
-url = "https://ponte.ozpro.com.br/api/cotacao/atual?pares=USD-BRL,BTC-BRL,SELIC,SOJA"
-resp = requests.get(url, headers=headers)
-data = resp.json()
+# Ranking em tempo real
+rank = requests.get("https://ponte.ozpro.com.br/api/cotacoes/ranking", headers=headers).json()
+print("Top Gainers:", [a['codigo'] + ' (' + a['var24h'] + ')' for a in rank['maioresAltas']])
 
-print(f"Dólar: R$ {data['ativos']['USD']['cotacao']}")
-print(f"Bitcoin: R$ {data['ativos']['BTC']['cotacao']:,}")
-print(f"Selic: {data['ativos']['SELIC']['valor']}% a.a.")
-print(f"Soja (60kg): R$ {data['ativos']['SOJA']['cotacao']}")
-```
-
-### 🔹 PHP (cURL)
-```php
-<?php
-$ch = curl_init("https://ponte.ozpro.com.br/api/cotacoes/busca?q=ouro");
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: Bearer cot_start_live_token123",
-    "Accept: application/json"
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$resposta = json_decode(curl_exec($ch), true);
-curl_close($ch);
-
-print_r($resposta['resultados']);
+# Conversão com IOF
+conv = requests.get("https://ponte.ozpro.com.br/api/cotacao/conversao?de=EUR&para=BRL&valor=1000&iof=4.38", headers=headers).json()
+print(f"Total: R$ {conv['conversao']['totalFinalComIof']}")
 ```
 
 ---
 
-## 🧪 7. Validação por Testes Nativos
+## 🧪 8. Testes Nativos Automatizados
 
-Execute a bateria completa de testes automatizados com Node.js:
-
+Execute a suíte nativa completa:
 ```bash
 node test.js
 ```
@@ -353,12 +244,12 @@ node test.js
 Resultado:
 ```text
 ========================================
-🎉 TODOS OS 157 TESTES PASSARAM COM 100% DE SUCESSO!
+🎉 TODOS OS 193 TESTES PASSARAM COM 100% DE SUCESSO!
    Falhas: 0
 ========================================
 ```
 
 ---
 
-## 📄 8. Licença
+## 📄 9. Licença
 Distribuído sob licença **MIT** &copy; 2026 Clepta Tech.
