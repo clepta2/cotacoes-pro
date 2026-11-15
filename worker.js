@@ -201,16 +201,26 @@ function aplicarRateLimit(keyId, config) {
   };
 }
 
-// ─── MASTER BASELINE & CACHE DE 170 ATIVOS CONSOLIDADOS ───
+// ─── MASTER BASELINE & CACHE DE 177 ATIVOS CONSOLIDADOS ───
 const BASELINE_DATA = {
   atualizadoEm: new Date().toISOString(),
   provedor: 'Ponte APIs • Master Feed Anycast Live Edge',
-  totalAtivos: 170,
+  totalAtivos: 177,
   resumoCategorias: {
     fiat: 64,
     crypto: 48,
     commoditiesAgro: 32,
-    indicesBrasil: 26
+    indicesBrasil: 26,
+    combustiveis: 7
+  },
+  combustiveis: {
+    GASOLINA: { codigo: 'GASOLINA', nome: 'Gasolina Comum (Bomba Posto)', cotacao: 6.14, moeda: 'BRL', var24h: '+0.15%', unidade: 'litro', fonte: 'ANP (Média Brasil)' },
+    GASOLINA_ADITIVADA: { codigo: 'GASOLINA_ADITIVADA', nome: 'Gasolina Aditivada (Bomba Posto)', cotacao: 6.38, moeda: 'BRL', var24h: '+0.10%', unidade: 'litro', fonte: 'ANP (Média Brasil)' },
+    DIESEL_S10: { codigo: 'DIESEL_S10', nome: 'Óleo Diesel S-10 (Bomba Posto)', cotacao: 6.08, moeda: 'BRL', var24h: '-0.20%', unidade: 'litro', fonte: 'ANP (Média Brasil)' },
+    DIESEL_S500: { codigo: 'DIESEL_S500', nome: 'Óleo Diesel S-500 Comum', cotacao: 5.92, moeda: 'BRL', var24h: '-0.15%', unidade: 'litro', fonte: 'ANP (Média Brasil)' },
+    ETANOL_POSTO: { codigo: 'ETANOL_POSTO', nome: 'Etanol Hidratado (Bomba Posto)', cotacao: 4.05, moeda: 'BRL', var24h: '+0.40%', unidade: 'litro', fonte: 'ANP (Média Brasil)' },
+    GNV: { codigo: 'GNV', nome: 'Gás Natural Veicular (GNV)', cotacao: 4.72, moeda: 'BRL', var24h: '+0.05%', unidade: 'm³', fonte: 'ANP (Média Brasil)' },
+    GLP_13KG: { codigo: 'GLP_13KG', nome: 'Gás de Cozinha GLP (Botijão 13kg)', cotacao: 104.80, moeda: 'BRL', var24h: '+0.25%', unidade: 'botijão 13kg', fonte: 'ANP (Média Brasil)' }
   },
   indicesBrasil: {
     SELIC: { codigo: 'SELIC', nome: 'Taxa Selic Over', valor: 11.25, unidade: '% a.a.', periodo: 'Anual', fonte: 'Banco Central do Brasil' },
@@ -570,8 +580,29 @@ function buscarAtivo(feed, codigoInput) {
   if (feed.crypto[cod]) return { categoria: 'crypto', ...feed.crypto[cod] };
   if (feed.indicesBrasil[cod]) return { categoria: 'indicesBrasil', ...feed.indicesBrasil[cod] };
   if (feed.commoditiesAgro[cod]) return { categoria: 'commoditiesAgro', ...feed.commoditiesAgro[cod] };
+  if (feed.combustiveis && feed.combustiveis[cod]) return { categoria: 'combustiveis', ...feed.combustiveis[cod] };
 
   const ALIASES = {
+    // Combustíveis ANP
+    'GASOLINA': 'GASOLINA',
+    'GASOLINA_COMUM': 'GASOLINA',
+    'GASOLINACOMUM': 'GASOLINA',
+    'GASOLINA_ADITIVADA': 'GASOLINA_ADITIVADA',
+    'GASOLINAADITIVADA': 'GASOLINA_ADITIVADA',
+    'DIESEL': 'DIESEL_S10',
+    'DIESEL_S10': 'DIESEL_S10',
+    'DIESELS10': 'DIESEL_S10',
+    'DIESEL_S500': 'DIESEL_S500',
+    'DIESELS500': 'DIESEL_S500',
+    'ETANOL_POSTO': 'ETANOL_POSTO',
+    'ETANOL_BOMBA': 'ETANOL_POSTO',
+    'GNV': 'GNV',
+    'GAS_NATURAL_VEICULAR': 'GNV',
+    'GLP': 'GLP_13KG',
+    'GLP_13KG': 'GLP_13KG',
+    'BOTIJAO': 'GLP_13KG',
+    'GAS_DE_COZINHA': 'GLP_13KG',
+
     // Moedas Fiat
     'DOLAR': 'USD',
     'DOLAR_COMERCIAL': 'USD',
@@ -679,6 +710,7 @@ function buscarAtivo(feed, codigoInput) {
     if (feed.crypto[aliasCod]) return { categoria: 'crypto', ...feed.crypto[aliasCod] };
     if (feed.indicesBrasil[aliasCod]) return { categoria: 'indicesBrasil', ...feed.indicesBrasil[aliasCod] };
     if (feed.commoditiesAgro[aliasCod]) return { categoria: 'commoditiesAgro', ...feed.commoditiesAgro[aliasCod] };
+    if (feed.combustiveis && feed.combustiveis[aliasCod]) return { categoria: 'combustiveis', ...feed.combustiveis[aliasCod] };
   }
 
   return null;
@@ -1069,7 +1101,8 @@ export default {
         ...montarLista('fiat', feed.fiat),
         ...montarLista('crypto', feed.crypto),
         ...montarLista('commoditiesAgro', feed.commoditiesAgro),
-        ...montarLista('indicesBrasil', feed.indicesBrasil)
+        ...montarLista('indicesBrasil', feed.indicesBrasil),
+        ...montarLista('combustiveis', feed.combustiveis || {})
       ];
 
       const formato = url.searchParams.get('formato') || url.searchParams.get('format') || 'json';
@@ -1104,7 +1137,8 @@ export default {
           fiat: montarLista('fiat', feed.fiat),
           crypto: montarLista('crypto', feed.crypto),
           commoditiesAgro: montarLista('commoditiesAgro', feed.commoditiesAgro),
-          indicesBrasil: montarLista('indicesBrasil', feed.indicesBrasil)
+          indicesBrasil: montarLista('indicesBrasil', feed.indicesBrasil),
+          combustiveis: montarLista('combustiveis', feed.combustiveis || {})
         },
         atualizadoEm: feed.atualizadoEm
       }, null, 2), {
@@ -1121,13 +1155,14 @@ export default {
     if (path === '/api/cotacoes/categorias' || path === '/api/cotacao/categorias') {
       return new Response(JSON.stringify({
         ok: true,
-        totalCategorias: 4,
+        totalCategorias: 5,
         totalAtivos: feed.totalAtivos,
         categorias: [
           { id: 'fiat', nome: 'Moedas Fiduciárias Globais', total: Object.keys(feed.fiat).length, endpoint: '/api/cotacoes/fiat' },
           { id: 'crypto', nome: 'Criptomoedas & Bitcoins', total: Object.keys(feed.crypto).length, endpoint: '/api/cotacoes/crypto' },
           { id: 'commoditiesAgro', nome: 'Agronegócio, Metais & Energia', total: Object.keys(feed.commoditiesAgro).length, endpoint: '/api/cotacoes/agro' },
-          { id: 'indicesBrasil', nome: 'Indicadores Oficiais & Bolsas', total: Object.keys(feed.indicesBrasil).length, endpoint: '/api/cotacoes/indices' }
+          { id: 'indicesBrasil', nome: 'Indicadores Oficiais & Bolsas', total: Object.keys(feed.indicesBrasil).length, endpoint: '/api/cotacoes/indices' },
+          { id: 'combustiveis', nome: 'Combustíveis na Bomba & ANP', total: Object.keys(feed.combustiveis || {}).length, endpoint: '/api/cotacoes/combustiveis' }
         ],
         atualizadoEm: feed.atualizadoEm
       }, null, 2), {
@@ -1159,6 +1194,7 @@ export default {
       varrer('crypto', feed.crypto);
       varrer('commoditiesAgro', feed.commoditiesAgro);
       varrer('indicesBrasil', feed.indicesBrasil);
+      if (feed.combustiveis) varrer('combustiveis', feed.combustiveis);
 
       if (resultados.length === 0) {
         const ativoPorAlias = buscarAtivo(feed, termo);
@@ -1231,6 +1267,19 @@ export default {
         return new Response(formatarCsv(itens), { status: 200, headers: { 'Content-Type': 'text/csv; charset=utf-8', ...TELEMETRY_HEADERS } });
       }
       return new Response(JSON.stringify({ ok: true, categoria: 'indicesBrasil', total: Object.keys(feed.indicesBrasil).length, ativos: feed.indicesBrasil, atualizadoEm: feed.atualizadoEm }, null, 2), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json; charset=utf-8', ...TELEMETRY_HEADERS }
+      });
+    }
+
+    if (path === '/api/cotacoes/combustiveis' || path === '/api/cotacao/combustiveis') {
+      const formato = url.searchParams.get('formato') || 'json';
+      const itensComb = feed.combustiveis || {};
+      if (formato === 'csv') {
+        const itens = Object.entries(itensComb).map(([c, v]) => ({ codigo: c, categoria: 'combustiveis', ...v }));
+        return new Response(formatarCsv(itens), { status: 200, headers: { 'Content-Type': 'text/csv; charset=utf-8', ...TELEMETRY_HEADERS } });
+      }
+      return new Response(JSON.stringify({ ok: true, categoria: 'combustiveis', total: Object.keys(itensComb).length, ativos: itensComb, atualizadoEm: feed.atualizadoEm }, null, 2), {
         status: 200,
         headers: { 'Content-Type': 'application/json; charset=utf-8', ...TELEMETRY_HEADERS }
       });
