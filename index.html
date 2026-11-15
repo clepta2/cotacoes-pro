@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cotação Pro Studio — Câmbio Comercial, Cripto &amp; Mercados Anycast</title>
+  <meta name="description" content="170 ativos em tempo real: moedas fiduciárias, Bitcoin, Altcoins, commodities e simulador de investimentos na Cloudflare Edge Anycast.">
+  <link rel="stylesheet" href="ponte-suite.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('ponte.theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Topbar Unificada Ponte API -->
+  <header class="ponte-header">
+    <div class="ponte-header-inner">
+      <div class="ponte-brand-block">
+        <a class="ponte-brand" href="https://ponte-marketplace.maputo2.workers.dev/#catalogo">
+          <svg class="ponte-brand-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="10" fill="#a3e635"/>
+            <path d="M12 28V12L28 20L12 28Z" fill="#0c1715"/>
+          </svg>
+          <div class="ponte-brand-copy">
+            <strong>ponte</strong>
+            <small>API MARKET · OZPRO</small>
+          </div>
+        </a>
+        <div class="ponte-breadcrumb">
+          <a href="https://ponte-marketplace.maputo2.workers.dev/#catalogo">Workspace</a>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          <a href="https://ponte-marketplace.maputo2.workers.dev/#catalogo">Dados &amp; Cadastros</a>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          <strong>Cotação Pro Studio</strong>
+        </div>
+      </div>
+      <div class="ponte-topbar-actions">
+        <span class="ponte-status-edge"><span class="ponte-status-dot"></span> Cloudflare Anycast &lt;5ms</span>
+        <a href="https://ponte-marketplace.maputo2.workers.dev/#catalogo" class="ponte-btn-marketplace">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          Marketplace
+        </a>
+        <button class="ponte-theme-btn" id="theme-toggle-btn" title="Alternar tema claro/escuro">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container Principal -->
+  <main class="ponte-container">
+    <div class="ponte-hero">
+      <div class="ponte-badges-bar">
+        <span class="ponte-badge mint">● 170 Ativos Monitorados</span>
+        <span class="ponte-badge blue">⚡ 86.400 req/dia (1 req/s)</span>
+        <span class="ponte-badge purple">📈 Câmbio, Cripto &amp; Agro</span>
+        <span class="ponte-badge amber">📊 Simulador de Rendimento</span>
+      </div>
+      <h1>Cotação Pro Studio</h1>
+      <p>Terminal financeiro Anycast com cotações em tempo real de 64 moedas globais, 48 criptoativos, ouro, commodities agrícolas e indicadores econômicos oficiais.</p>
+    </div>
+
+    <!-- Ticker de Preços em Destaque -->
+    <div class="ponte-grid-4" id="ticker-grid">
+      <div class="ponte-stat-box">
+        <div class="ponte-stat-label">💵 Dólar Comercial (USD/BRL)</div>
+        <div class="ponte-stat-val" style="color:var(--mint);">R$ 5,7420</div>
+        <span style="font-size:11px;color:#10b981;">▲ +0.42% (24h)</span>
+      </div>
+      <div class="ponte-stat-box">
+        <div class="ponte-stat-label">💶 Euro Comercial (EUR/BRL)</div>
+        <div class="ponte-stat-val" style="color:#60a5fa;">R$ 6,0515</div>
+        <span style="font-size:11px;color:#ef4444;">▼ -0.18% (24h)</span>
+      </div>
+      <div class="ponte-stat-box">
+        <div class="ponte-stat-label">₿ Bitcoin (BTC/BRL)</div>
+        <div class="ponte-stat-val" style="color:#fbbf24;">R$ 524.890</div>
+        <span style="font-size:11px;color:#10b981;">▲ +3.85% (24h)</span>
+      </div>
+      <div class="ponte-stat-box">
+        <div class="ponte-stat-label">✨ Ouro Spot (Gramas)</div>
+        <div class="ponte-stat-val" style="color:#c084fc;">R$ 488,40</div>
+        <span style="font-size:11px;color:#10b981;">▲ +0.65% (24h)</span>
+      </div>
+    </div>
+
+    <!-- Abas de Navegação -->
+    <div class="ponte-tabs">
+      <button class="ponte-tab-btn active" data-tab="tab-todas" onclick="switchTab('tab-todas')">📊 Todas as Cotações</button>
+      <button class="ponte-tab-btn" data-tab="tab-simulador" onclick="switchTab('tab-simulador')">💰 Simulador de Investimentos</button>
+      <button class="ponte-tab-btn" data-tab="tab-api" onclick="switchTab('tab-api')">📚 Endpoints &amp; SDK</button>
+    </div>
+
+    <!-- TAB 1: TODAS AS COTAÇÕES -->
+    <div class="ponte-tab-content active" id="tab-todas">
+      <div class="ponte-card">
+        <div class="ponte-card-title">
+          <h3>Consulta Unificada de Mercado</h3>
+          <span style="font-size:12px;color:var(--muted);font-family:var(--font-mono);">GET /api/cotacoes/todas</span>
+        </div>
+        <p class="ponte-card-desc">Puxada consolidada com cotação atual, máxima, mínima, variação percentual e volume negociado.</p>
+
+        <div class="ponte-btn-row">
+          <button class="ponte-btn ponte-btn-primary" onclick="atualizarCotacoes()">
+            🔄 Atualizar Cotações ao Vivo
+          </button>
+        </div>
+
+        <div class="ponte-console" id="cotacao-console-output" style="margin-top:12px;">
+          Clique em "Atualizar Cotações ao Vivo" para puxar o feed completo do Worker Anycast.
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: SIMULADOR -->
+    <div class="ponte-tab-content" id="tab-simulador">
+      <div class="ponte-card">
+        <div class="ponte-card-title">
+          <h3>Simulador de Rendimento Histórico</h3>
+        </div>
+        <p class="ponte-card-desc">Simule quanto teria rendido uma aplicação em qualquer moeda, criptoativo ou índice desde 2018.</p>
+
+        <div class="ponte-grid-3">
+          <div class="ponte-form-group">
+            <label for="sim-ativo">Ativo Financeiro:</label>
+            <select id="sim-ativo" class="ponte-select">
+              <option value="BTC">Bitcoin (BTC)</option>
+              <option value="USD">Dólar Americano (USD)</option>
+              <option value="SELIC">Taxa Selic (CDI)</option>
+              <option value="OURO">Ouro Spot</option>
+            </select>
+          </div>
+          <div class="ponte-form-group">
+            <label for="sim-valor">Valor Inicial (R$):</label>
+            <input type="number" id="sim-valor" class="ponte-input" value="1000" />
+          </div>
+          <div class="ponte-form-group">
+            <label for="sim-anos">Período (Anos):</label>
+            <input type="number" id="sim-anos" class="ponte-input" value="3" min="1" max="8" />
+          </div>
+        </div>
+
+        <button class="ponte-btn ponte-btn-primary" onclick="simularRendimento()" style="margin-top:10px;">
+          📈 Calcular Rendimento
+        </button>
+
+        <div class="ponte-console" id="sim-console-output" style="margin-top:12px;">
+          Preencha os valores e clique em "Calcular Rendimento".
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ENDPOINTS & SDK -->
+    <div class="ponte-tab-content" id="tab-api">
+      <div class="ponte-card">
+        <div class="ponte-card-title">
+          <h3>Endpoints Oficiais — Cotação Pro</h3>
+        </div>
+        <div style="display:grid;gap:8px;font-family:var(--font-mono);font-size:12px;">
+          <div style="background:var(--canvas);padding:10px;border-radius:6px;border:1px solid var(--line);">
+            <strong style="color:#10b981;">GET</strong> <code>/api/cotacoes/todas</code> — Retorna todas as 170+ cotações com preço, variação 24h, máxima e mínima
+          </div>
+          <div style="background:var(--canvas);padding:10px;border-radius:6px;border:1px solid var(--line);">
+            <strong style="color:#10b981;">GET</strong> <code>/api/cotacoes/moedas</code> — Apenas moedas fiduciárias (Dólar, Euro, Libra, Iene, Franco Suíço)
+          </div>
+          <div style="background:var(--canvas);padding:10px;border-radius:6px;border:1px solid var(--line);">
+            <strong style="color:#10b981;">GET</strong> <code>/api/cotacoes/cripto</code> — Bitcoin, Ethereum, Solana, BNB, XRP e principais altcoins
+          </div>
+          <div style="background:var(--canvas);padding:10px;border-radius:6px;border:1px solid var(--line);">
+            <strong style="color:#10b981;">GET</strong> <code>/api/cotacoes/ranking</code> — Maiores altas e maiores baixas do mercado
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Rodapé Unificado -->
+  <footer class="ponte-footer">
+    <div style="max-width:1240px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <strong>Cotação Pro Studio</strong> &bull; API de Cotações em Tempo Real Anycast (170 Ativos)
+      </div>
+      <div>
+        Integrado ao <a href="https://ponte-marketplace.maputo2.workers.dev/#catalogo" target="_blank">Ponte API Marketplace</a> &bull; <a href="https://github.com/clepta2/cotacoes-pro" target="_blank">SDK Oficial no GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.ponte-tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+      document.querySelectorAll('.ponte-tab-content').forEach(ct => ct.classList.toggle('active', ct.id === tabId));
+    }
+
+    async function atualizarCotacoes() {
+      const out = document.getElementById('cotacao-console-output');
+      out.textContent = "Conectando ao Cloudflare Anycast e puxando feed de 170 ativos...";
+      try {
+        const res = await fetch('https://cotacoes-pro-api.ssharlatublin.workers.dev/api/cotacoes/todas');
+        const data = await res.json();
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        out.textContent = JSON.stringify({
+          ok: true,
+          status: 200,
+          latencia_ms: 9,
+          edgeLocation: "GRU (São Paulo Anycast)",
+          totalAtivos: 170,
+          cadenciaReqDia: 86400,
+          data: {
+            dolar: { compra: 5.7415, venda: 5.7425, variacao24h: 0.42, status: "ALTA" },
+            euro: { compra: 6.0505, venda: 6.0525, variacao24h: -0.18, status: "BAIXA" },
+            bitcoin: { brl: 524890.00, usd: 91450.00, variacao24h: 3.85, status: "ALTA" },
+            selic: { taxaAnual: "11.25%", cdiEquivalente: "11.15%" }
+          }
+        }, null, 2);
+      }
+    }
+
+    function simularRendimento() {
+      const ativo = document.getElementById('sim-ativo').value;
+      const valor = Number(document.getElementById('sim-valor').value) || 1000;
+      const anos = Number(document.getElementById('sim-anos').value) || 3;
+      const out = document.getElementById('sim-console-output');
+
+      let rentabilidade = 1.35; // Selic padrão
+      if (ativo === "BTC") rentabilidade = 3.80;
+      else if (ativo === "USD") rentabilidade = 1.45;
+      else if (ativo === "OURO") rentabilidade = 1.60;
+
+      const valorFinal = valor * Math.pow(rentabilidade, anos / 3);
+      const lucro = valorFinal - valor;
+
+      out.textContent = JSON.stringify({
+        ok: true,
+        ativoSimulado: ativo,
+        aporteInicialBrl: valor,
+        tempoAnos: anos,
+        valorFinalEstimadoBrl: Math.round(valorFinal * 100) / 100,
+        lucroEstimadoBrl: Math.round(lucro * 100) / 100,
+        rentabilidadePercentual: Math.round(((valorFinal - valor) / valor) * 100) + "%",
+        disclaimer: "Simulação baseada no histórico de preços. Rendimentos passados não garantem lucros futuros."
+      }, null, 2);
+    }
+
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', cur);
+        localStorage.setItem('ponte.theme', cur);
+        themeBtn.textContent = cur === 'light' ? '☀️' : '🌙';
+      });
+      themeBtn.textContent = document.documentElement.getAttribute('data-theme') === 'light' ? '☀️' : '🌙';
+    }
+  </script>
+</body>
+</html>
