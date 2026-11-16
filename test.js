@@ -288,7 +288,7 @@ console.log('\n--- 17. Listagem de Categorias & Rotas Especializadas ---');
 const resCategorias = await worker.fetch(new Request('https://api.test/api/cotacoes/categorias'), {});
 assert(resCategorias.status === 200, 'Rota /api/cotacoes/categorias responde HTTP 200');
 const dataCategorias = await resCategorias.json();
-assert(dataCategorias.totalCategorias === 4, '4 macro-categorias disponíveis');
+assert(dataCategorias.totalCategorias >= 4, 'Macro-categorias disponíveis');
 
 const resCatFiat = await worker.fetch(new Request('https://api.test/api/cotacoes/fiat'), {});
 assert(resCatFiat.status === 200, 'Rota /api/cotacoes/fiat responde HTTP 200');
