@@ -417,11 +417,65 @@ let memoryFeedCache = null;
 let lastFetchTimestamp = 0;
 const CACHE_TTL_MS = 3000; // 3 segundos de micro-cache na RAM Anycast (<5ms)
 
+let memoryBcbIndicesCache = null;
+let lastBcbFetchTimestamp = 0;
+const BCB_CACHE_TTL_MS = 3600 * 1000; // 1 hora de cache na borda (dados oficiais diários/mensais do BCB)
+
+async function getBcbIndicesLive() {
+  const now = Date.now();
+  if (memoryBcbIndicesCache && (now - lastBcbFetchTimestamp < BCB_CACHE_TTL_MS)) {
+    return memoryBcbIndicesCache;
+  }
+
+  const indicesAtualizados = { ...BASELINE_DATA.indicesBrasil };
+
+  try {
+    const series = [
+      { chave: 'SELIC', id: 432 },
+      { chave: 'SELIC_META', id: 432 },
+      { chave: 'CDI', id: 4389 },
+      { chave: 'IPCA', id: 13522 }
+    ];
+
+    await Promise.allSettled(series.map(async (s) => {
+      try {
+        const resp = await fetch(`https://api.bcb.gov.br/dados/serie/bcdata.sgs.${s.id}/dados/ultimos/1?formato=json`, {
+          headers: { 'User-Agent': 'CotacoesPro-BCB/1.0' },
+          signal: AbortSignal.timeout(2500)
+        });
+        if (resp.ok) {
+          const arr = await resp.json();
+          if (Array.isArray(arr) && arr.length > 0 && arr[0].valor) {
+            const val = parseFloat(arr[0].valor);
+            if (!isNaN(val)) {
+              indicesAtualizados[s.chave] = {
+                ...indicesAtualizados[s.chave],
+                valor: val,
+                dataReferenciaBcb: arr[0].data,
+                fonte: 'Banco Central do Brasil (SGS Oficial)',
+                tipoDado: 'OFICIAL_BCB_TEMPO_REAL'
+              };
+            }
+          }
+        }
+      } catch (_) {}
+    }));
+
+    memoryBcbIndicesCache = indicesAtualizados;
+    lastBcbFetchTimestamp = now;
+    return indicesAtualizados;
+  } catch (_) {
+    return BASELINE_DATA.indicesBrasil;
+  }
+}
+
 async function getMasterFeed() {
   const now = Date.now();
   if (memoryFeedCache && (now - lastFetchTimestamp < CACHE_TTL_MS)) {
     return memoryFeedCache;
   }
+
+  const indicesOficiais = await getBcbIndicesLive();
 
   try {
     const res = await fetch(`https://economia.awesomeapi.com.br/last/${AWESOME_PAIRS}`, {
@@ -545,23 +599,27 @@ async function getMasterFeed() {
         ...BASELINE_DATA,
         atualizadoEm: new Date().toISOString(),
         provedor: 'Ponte APIs • Live Anycast Edge (Sub-1ms RAM)',
-        totalAtivos: Object.keys(updatedFiat).length + Object.keys(updatedCrypto).length + Object.keys(updatedAgro).length + Object.keys(BASELINE_DATA.indicesBrasil).length,
+        totalAtivos: Object.keys(updatedFiat).length + Object.keys(updatedCrypto).length + Object.keys(updatedAgro).length + Object.keys(indicesOficiais).length,
         resumoCategorias: {
           fiat: Object.keys(updatedFiat).length,
           crypto: Object.keys(updatedCrypto).length,
           commoditiesAgro: Object.keys(updatedAgro).length,
-          indicesBrasil: Object.keys(BASELINE_DATA.indicesBrasil).length
+          indicesBrasil: Object.keys(indicesOficiais).length
         },
         fiat: updatedFiat,
         crypto: updatedCrypto,
-        commoditiesAgro: updatedAgro
+        commoditiesAgro: updatedAgro,
+        indicesBrasil: indicesOficiais
       };
       lastFetchTimestamp = now;
       return memoryFeedCache;
     }
   } catch (_) {}
 
-  memoryFeedCache = BASELINE_DATA;
+  memoryFeedCache = {
+    ...BASELINE_DATA,
+    indicesBrasil: indicesOficiais
+  };
   lastFetchTimestamp = now;
   return memoryFeedCache;
 }
